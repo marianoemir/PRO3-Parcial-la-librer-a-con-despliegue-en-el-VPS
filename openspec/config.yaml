@@ -1,0 +1,38 @@
+schema: spec-driven
+context: |
+  Parcial Programación III (UTN): API de librería con FastAPI + SQLModel + SQLAlchemy 2.0
+  async + asyncpg + PostgreSQL 16, empaquetada en Docker (python:3.12-alpine, sin Compose)
+  y desplegada en el VPS con docker run + --env-file.
+  Fuente de verdad: docs/Parcial_Cap1a4_Consigna.pdf y knowledge-base/. Ante conflicto con
+  cualquier skill, prevalecen el PDF y la KB.
+  Estructura obligatoria: app/main.py, app/core/{config,database}.py y
+  app/modules/<módulo>/{models,schemas,service,router}.py (health, editoriales, generos,
+  autores, libros, clientes, ventas); test/*.http; Dockerfile; .dockerignore; DEPLOY.md;
+  evidencia/.
+  Nombres de tablas y columnas del enunciado obligatorios (no quitar ni renombrar).
+  Garantías delegadas a la base (UNIQUE, FK, CHECK): se escribe y se traduce IntegrityError
+  a 409 con mensaje propio, sin consultas previas de existencia ni texto interno de la base.
+  Sin carga perezosa (joinedload/selectinload), sin SQL concatenado, dinero con Decimal,
+  todos los handlers async def. Sin migraciones (create_all en el lifespan).
+  Sin secretos en código, repo, imagen ni zip (env.example sin valores reales).
+  Las dudas que el enunciado no resuelve van a knowledge-base/10_preguntas_abiertas.md y se
+  citan como pendientes; no se resuelven en silencio.
+  Escribir todos los artefactos en español.
+rules:
+  proposal:
+    - Citar los códigos RN-xx / RT-xx y los casos C-xx / D-xx que cubre el change.
+    - Declarar qué queda fuera de alcance.
+  design:
+    - Justificar cada decisión de dominio; lo no definido por el enunciado es pregunta abierta.
+  specs:
+    - Al menos tres escenarios verificables (esperado, error de negocio y borde).
+  tasks:
+    - Cada task indica cómo se verifica (archivo .http, salida de consola o comando docker).
+    - Tareas de máximo 2 horas.
+operations:
+  apply:
+    guidance:
+      - No commitear sin pedido explícito; usar la salida real de las herramientas como evidencia.
+  archive:
+    guidance:
+      - Marcar [x] en CHANGES.md solo del change archivado.
