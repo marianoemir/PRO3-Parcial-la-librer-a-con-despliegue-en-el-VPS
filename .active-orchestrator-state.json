@@ -1,0 +1,182 @@
+{
+  "version": 5,
+  "step": "done",
+  "owner": "active-orchestrator",
+  "discovery": {
+    "skipped": true
+  },
+  "kb": {
+    "created_by": "kb-creator",
+    "source": "ingest",
+    "discovery": {
+      "problem": "Gestionar el catálogo y las ventas de una librería de barrio mediante una API asincrónica con persistencia relacional y despliegue en contenedor sobre el VPS.",
+      "system_type": "api",
+      "domain": "libreria (catálogo y ventas de libros)",
+      "scale": "public_multi_user (inferred, low confidence)",
+      "stack": "Python 3.12 + FastAPI >=0.111 + SQLModel >=0.0.24 + SQLAlchemy 2.0 async + asyncpg >=0.30 + PostgreSQL 16 + Docker",
+      "needs_infra": true
+    },
+    "files": [
+      "knowledge-base/01_vision_y_objetivos.md",
+      "knowledge-base/02_descripcion_general.md",
+      "knowledge-base/03_actores_y_roles.md",
+      "knowledge-base/04_modelo_de_datos.md",
+      "knowledge-base/05_reglas_de_negocio.md",
+      "knowledge-base/06_funcionalidades.md",
+      "knowledge-base/07_flujos_principales.md",
+      "knowledge-base/08_arquitectura_propuesta.md",
+      "knowledge-base/09_decisiones_y_supuestos.md",
+      "knowledge-base/10_preguntas_abiertas.md",
+      "knowledge-base/12_despliegue_docker_y_vps.md",
+      "knowledge-base/README.md"
+    ]
+  },
+  "visual_design": {
+    "created_by": "design-system",
+    "mode": "deferred",
+    "status": "deferred",
+    "path": "design-system/README.md"
+  },
+  "roadmap": {
+    "created_by": "roadmap-generator",
+    "source": "CHANGES.md",
+    "changes": ["CH-01", "CH-02", "CH-03", "CH-04", "CH-05", "CH-06", "CH-07", "CH-08", "CH-09", "CH-10", "CH-11", "CH-12"]
+  },
+  "skills": {
+    "created_by": "find-skill",
+    "mode": "recommend-only",
+    "derived": {
+      "stack": "Python 3.12 + FastAPI >=0.111 + SQLModel >=0.0.24 + SQLAlchemy 2.0 async + asyncpg >=0.30 + PostgreSQL 16 + Docker",
+      "domains": ["libreria (catalogo y ventas de libros)", "api asincronica REST", "persistencia relacional", "despliegue en contenedor / VPS"],
+      "problem": "Gestionar el catalogo y las ventas de una libreria de barrio mediante una API asincronica con persistencia relacional y despliegue en contenedor sobre el VPS."
+    },
+    "recommended": [
+      {
+        "name": "fastapi",
+        "repo": "fastapi/fastapi",
+        "installs": 14700,
+        "why": "Official FastAPI skill (104.5K stars): async handlers, APIRouter prefix/tags, Depends + lifespan match app/main.py and thin router/service split.",
+        "installCommand": "npx skills add fastapi/fastapi@fastapi",
+        "url": "https://skills.sh/fastapi/fastapi/fastapi"
+      },
+      {
+        "name": "sqlmodel",
+        "repo": "fastapi/sqlmodel",
+        "installs": 179,
+        "why": "Official SQLModel skill (18.5K stars): table models with Field/Relationship and SQLModel-first patterns match models.py vs schemas.py separation.",
+        "installCommand": "npx skills add fastapi/sqlmodel@sqlmodel",
+        "url": "https://skills.sh/fastapi/sqlmodel/sqlmodel"
+      },
+      {
+        "name": "fastapi-templates",
+        "repo": "wshobson/agents",
+        "installs": 26400,
+        "why": "FastAPI project templates map directly to the modular app/modules/<modulo>/{models,schemas,service,router}.py layout.",
+        "installCommand": "npx skills add wshobson/agents@fastapi-templates",
+        "url": "https://skills.sh/wshobson/agents/fastapi-templates"
+      },
+      {
+        "name": "fastapi-python",
+        "repo": "mindrally/skills",
+        "installs": 14000,
+        "why": "Python FastAPI guidance for typed async endpoints, sessions via Depends(get_session), and 201/404/409/422 codes.",
+        "installCommand": "npx skills add mindrally/skills@fastapi-python",
+        "url": "https://skills.sh/mindrally/skills/fastapi-python"
+      },
+      {
+        "name": "fastapi-patterns",
+        "repo": "affaan-m/ecc",
+        "installs": 8300,
+        "why": "FastAPI architecture patterns reinforce thin router + service-owned logic with IntegrityError translation.",
+        "installCommand": "npx skills add affaan-m/ecc@fastapi-patterns",
+        "url": "https://skills.sh/affaan-m/ecc/fastapi-patterns"
+      },
+      {
+        "name": "fastapi-async-patterns",
+        "repo": "thebushidocollective/han",
+        "installs": 957,
+        "why": "Async-first patterns for async def handlers, joinedload/selectinload (avoid N+1), and BackgroundTasks without blocking.",
+        "installCommand": "npx skills add thebushidocollective/han@fastapi-async-patterns",
+        "url": "https://skills.sh/thebushidocollective/han/fastapi-async-patterns"
+      },
+      {
+        "name": "python-testing-patterns",
+        "repo": "wshobson/agents",
+        "installs": 39700,
+        "why": "Battle-tested pytest patterns for service/router testing and async SQLAlchemy fixtures.",
+        "installCommand": "npx skills add wshobson/agents@python-testing-patterns",
+        "url": "https://skills.sh/wshobson/agents/python-testing-patterns"
+      },
+      {
+        "name": "api-testing",
+        "repo": "secondsky/claude-skills",
+        "installs": 908,
+        "why": "API endpoint testing workflow fits the .http cases (C-07, D cases) and per-module CRUD verification.",
+        "installCommand": "npx skills add secondsky/claude-skills@api-testing",
+        "url": "https://skills.sh/secondsky/claude-skills/api-testing"
+      },
+      {
+        "name": "document-api-endpoint",
+        "repo": "getsentry/skills",
+        "installs": 1300,
+        "why": "OpenAPI endpoint documentation aligns with FastAPI auto-docs for the catalogo/ventas reference endpoints.",
+        "installCommand": "npx skills add getsentry/skills@document-api-endpoint",
+        "url": "https://skills.sh/getsentry/skills/document-api-endpoint"
+      },
+      {
+        "name": "python-best-practices",
+        "repo": "alleneubank/claude-code",
+        "installs": 2200,
+        "why": "Python 3.12 quality, typing, and async conventions for config, database engine/session, and lifespan code.",
+        "installCommand": "npx skills add alleneubank/claude-code@python-best-practices",
+        "url": "https://skills.sh/alleneubank/claude-code/python-best-practices"
+      },
+      {
+        "name": "multi-stage-dockerfile",
+        "repo": "github/awesome-copilot",
+        "installs": 31400,
+        "why": "Multi-stage Dockerfile patterns match the single-image packaging, .dockerignore, and HEALTHCHECK setup for VPS deploy.",
+        "installCommand": "npx skills add github/awesome-copilot@multi-stage-dockerfile",
+        "url": "https://skills.sh/github/awesome-copilot/multi-stage-dockerfile"
+      },
+      {
+        "name": "docker-patterns",
+        "repo": "affaan-m/ecc",
+        "installs": 15400,
+        "why": "Docker patterns for docker build/run, --env-file secrets, non-root, and host.docker.internal wiring.",
+        "installCommand": "npx skills add affaan-m/ecc@docker-patterns",
+        "url": "https://skills.sh/affaan-m/ecc/docker-patterns"
+      },
+      {
+        "name": "docker-build-strategies",
+        "repo": "docker/skills",
+        "installs": 1700,
+        "why": "Official Docker build strategies for layer caching and reproducible VPS image builds.",
+        "installCommand": "npx skills add docker/skills@docker-build-strategies",
+        "url": "https://skills.sh/docker/skills/docker-build-strategies"
+      },
+      {
+        "name": "docker-project-foundations",
+        "repo": "docker/skills",
+        "installs": 1400,
+        "why": "Official Docker project foundations for Dockerfile, .env/env.example, and DEPLOY.md structure.",
+        "installCommand": "npx skills add docker/skills@docker-project-foundations",
+        "url": "https://skills.sh/docker/skills/docker-project-foundations"
+      }
+    ],
+    "installed": ["fastapi", "sqlmodel"]
+  },
+  "registry": {
+    "created_by": "skill-registry",
+    "path": ".atl/skill-registry.md",
+    "skills": ["fastapi", "sqlmodel"],
+    "conventions_found": 0,
+    "engram": "saved",
+    "engram_id": 102
+  },
+  "agents": {
+    "created_by": "agent-instruction",
+    "files": ["CLAUDE.md", "AGENTS.md"],
+    "reglas_applied": ["sin Docker Compose", "enunciado prevalece sobre skills", "sin migraciones", "Decimal nunca float", "IntegrityError a 409 sin pre-check", "prohibido lazy loading", "SQL parametrizado + async", "sin secretos", "stack impuesto sin consultar", "no inventar reglas de negocio", "no endpoints fuera de tabla", "nombres obligatorios del enunciado", "evidencia con salida real", "no commit/push sin pedido", "no cerrar change sin verificar spec", "AGENTS/CLAUDE identicos"]
+  }
+}
