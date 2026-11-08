@@ -175,7 +175,7 @@ Paso │ Agente A (Backend Core) │ Agente B (Backend Aux)        │ Agente C 
   - `knowledge-base/10_preguntas_abiertas.md` §(3) y §(5) — PENDIENTES
 
 ### [CH-05] `libros-autorias`
-- **Estado**: `[ ]` pendiente
+- **Estado**: `[x]` completado
 - **Scope**: CRUD de libros con autorías, paginación y búsqueda (US-003 + parte de US-004: alta con relaciones)
   - Dueño potencial: Agente A (Backend Core) — una sesión (~4-6 h)
   - Casos cubiertos: C-01 (id de ruta no entero → 422 sin ejecutar el handler), C-02 (ISBN repetido → 409 propio), C-04 (editorial/autor inexistente → 409), C-08 (búsqueda `' OR '1'='1` → 200 lista vacía), C-07 parcial (detalle de libro con número fijo de consultas — la evidencia va en CH-12)
