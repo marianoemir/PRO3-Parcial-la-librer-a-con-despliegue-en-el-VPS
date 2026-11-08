@@ -100,7 +100,7 @@ Paso │ Agente A (Backend Core) │ Agente B (Backend Aux)        │ Agente C 
 ## FASE 0 — Cimientos
 
 ### [CH-01] `foundation-setup`
-- **Estado**: `[ ]` pendiente
+- **Estado**: `[x]` completado
 - **Scope**: Levantar la aplicación asincrónica con lifespan y health (US-001)
   - Dueño potencial: Agente A (Backend Core) — una sesión (~4-6 h)
   - Casos cubiertos: ninguno directo; habilita el arranque para todos los casos C/D
