@@ -118,7 +118,7 @@ Paso │ Agente A (Backend Core) │ Agente B (Backend Aux)        │ Agente C 
   - `knowledge-base/10_preguntas_abiertas.md` §(2) — PENDIENTE
 
 ### [CH-02] `core-models`
-- **Estado**: `[ ]` pendiente
+- **Estado**: `[x]` completado
 - **Scope**: Publicar el modelo relacional completo — va ANTES de cualquier service o router (US-002)
   - Dueño potencial: Agente A (Backend Core) — una sesión (~4-6 h)
   - Casos cubiertos: ninguno directo; habilita los casos de restricción C-02 a C-06 (los prueba CH-09)
