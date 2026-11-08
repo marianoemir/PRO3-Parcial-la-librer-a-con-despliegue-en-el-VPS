@@ -135,7 +135,7 @@ Paso │ Agente A (Backend Core) │ Agente B (Backend Aux)        │ Agente C 
   - `knowledge-base/10_preguntas_abiertas.md` §(4) y §(7) — PENDIENTES
 
 ### [CH-03] `docker-imagen`
-- **Estado**: `[ ]` pendiente
+- **Estado**: `[x]` completado
 - **Scope**: Empaquetar la imagen Docker — change propio, arranca temprano en paralelo al dominio (DD-06)
   - Dueño potencial: Agente C (Infra/DevOps) — una sesión (~4-6 h)
   - Casos cubiertos: D-01 (base `python:3.12-alpine` < 100 MB según `docker images`), D-06 (`docker exec libreria id` no es root), verificado localmente; evidencia final en CH-12
