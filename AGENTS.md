@@ -64,6 +64,7 @@ Ver `CHANGES.md` (CH-01 a CH-12, 4–6 h por change). Camino crítico: **CH-01 �
 - **NUNCA commitear/pushear sin pedido explícito; commits convencionales (`feat:`, `fix:`, `docs:`, `chore:`).**
 - **NUNCA cerrar un change sin verificar cada escenario de su spec.**
 - **AGENTS.md y CLAUDE.md idénticos; si se cambia uno, se actualiza el otro.**
+- **Estructura de módulo**: todos los módulos (incluido `health`) tienen `models.py`, `schemas.py`, `service.py` y `router.py`. La lógica vive en el `service`, que recibe la sesión como parámetro y traduce los errores; el `router` solo recibe, delega y declara la respuesta, sin SQL ni `try/except` de base. Los DTO se nombran `Create`, `Update` y `Read`.
 
 ## Flujo de Trabajo
 
