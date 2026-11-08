@@ -26,6 +26,7 @@ from app.core import config  # noqa: F401
 from app.core.database import create_engine, create_session_factory
 from app.modules.clientes.router import router as clientes_router
 from app.modules.health.router import router as health_router
+from app.modules.libros.router import router as libros_router
 
 # CH-02: importar TODOS los modelos de dominio ANTES de create_all,
 # para que SQLModel.metadata esté completo cuando el lifespan crea
@@ -61,3 +62,4 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
 app = FastAPI(lifespan=lifespan)
 app.include_router(health_router)
 app.include_router(clientes_router)
+app.include_router(libros_router)

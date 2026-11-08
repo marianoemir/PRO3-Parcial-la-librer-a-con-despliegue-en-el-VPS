@@ -1,4 +1,4 @@
-﻿# CHANGES — Secuencia de Implementación
+# CHANGES — Secuencia de Implementación
 
 > Índice canónico de todos los changes del proyecto **Parcial Programación III — La Librería con Despliegue en el VPS**.
 > Cada change es atómico: un agente puede implementarlo en una sesión (~4-6 horas).
@@ -135,7 +135,7 @@ Paso │ Agente A (Backend Core) │ Agente B (Backend Aux)        │ Agente C 
   - `knowledge-base/10_preguntas_abiertas.md` §(4) y §(7) — PENDIENTES
 
 ### [CH-03] `docker-imagen`
-- **Estado**: `[ ]` pendiente
+- **Estado**: `[x]` completado
 - **Scope**: Empaquetar la imagen Docker — change propio, arranca temprano en paralelo al dominio (DD-06)
   - Dueño potencial: Agente C (Infra/DevOps) — una sesión (~4-6 h)
   - Casos cubiertos: D-01 (base `python:3.12-alpine` < 100 MB según `docker images`), D-06 (`docker exec libreria id` no es root), verificado localmente; evidencia final en CH-12
@@ -175,7 +175,7 @@ Paso │ Agente A (Backend Core) │ Agente B (Backend Aux)        │ Agente C 
   - `knowledge-base/10_preguntas_abiertas.md` §(3) y §(5) — PENDIENTES
 
 ### [CH-05] `libros-autorias`
-- **Estado**: `[ ]` pendiente
+- **Estado**: `[x]` completado
 - **Scope**: CRUD de libros con autorías, paginación y búsqueda (US-003 + parte de US-004: alta con relaciones)
   - Dueño potencial: Agente A (Backend Core) — una sesión (~4-6 h)
   - Casos cubiertos: C-01 (id de ruta no entero → 422 sin ejecutar el handler), C-02 (ISBN repetido → 409 propio), C-04 (editorial/autor inexistente → 409), C-08 (búsqueda `' OR '1'='1` → 200 lista vacía), C-07 parcial (detalle de libro con número fijo de consultas — la evidencia va en CH-12)
