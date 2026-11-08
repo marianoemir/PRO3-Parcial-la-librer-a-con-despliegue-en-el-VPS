@@ -24,6 +24,7 @@ from sqlmodel import SQLModel
 # (1.3), incluso antes del lifespan. El motor se crea en el lifespan.
 from app.core import config  # noqa: F401
 from app.core.database import create_engine, create_session_factory
+from app.modules.clientes.router import router as clientes_router
 from app.modules.health.router import router as health_router
 from app.modules.libros.router import router as libros_router
 
@@ -60,4 +61,5 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
 
 app = FastAPI(lifespan=lifespan)
 app.include_router(health_router)
+app.include_router(clientes_router)
 app.include_router(libros_router)

@@ -1,0 +1,83 @@
+# Spec Delta
+
+## Purpose
+
+Permitir administrar clientes y su perfil uno a uno, y consultar de forma paginada las ventas resumidas de cada cliente sin exponer renglones.
+
+## ADDED Requirements
+
+### Requirement: Alta y actualización parcial de clientes
+El sistema SHALL crear clientes con `nombre` y `email` mediante `POST /clientes/`, devolver 201 y un `ClienteRead`, y SHALL actualizar solamente los campos enviados en `PATCH /clientes/{id}`. `ClienteCreate` y `ClienteUpdate` SHALL rechazar todo campo no declarado, incluido `id` en el alta; `ClienteUpdate` SHALL admitir `nombre` y/o `email` omitidos, pero SHALL rechazar `{}` y `null` explícito para cualquiera de sus campos. Las respuestas SHALL usar `ClienteRead`.
+
+#### Scenario: Alta válida de cliente
+- **WHEN** se envía `POST /clientes/` con `nombre` y un `email` válidos y no registrados
+- **THEN** el sistema responde 201 con `id`, `nombre`, `email` y `perfil: null`
+
+#### Scenario: Email repetido no expone detalles de la base
+- **WHEN** se envía un alta o una actualización con un `email` ya registrado para otro cliente
+- **THEN** el sistema responde 409 con un mensaje propio que no contiene nombres de tablas, constraints ni trazas (RN-02, RN-12)
+
+#### Scenario: Actualización parcial de cliente inexistente
+- **WHEN** se envía `PATCH /clientes/{id}` para un id que no existe
+- **THEN** el sistema responde 404
+
+#### Scenario: Contrato de cliente inválido
+- **WHEN** se envía un cuerpo que no satisface el DTO de alta o actualización, o un id de ruta que no es entero
+- **THEN** el sistema responde 422 sin aplicar una escritura
+
+#### Scenario: Campo no declarado, nulo o PATCH vacío no cambia el cliente
+- **WHEN** se envía `POST /clientes/` con `id` u otro campo no declarado, o `PATCH /clientes/{id}` con un campo no declarado, con `{}`, o con `nombre` o `email` explícitamente en `null`
+- **THEN** el sistema responde 422 y no crea ni modifica el cliente
+
+### Requirement: Perfil único asociado al cliente de la ruta
+El sistema SHALL crear un perfil con `POST /clientes/{id}/perfil` usando exclusivamente el id de la ruta como `cliente_id`. `PerfilCreate` SHALL incluir únicamente `telefono` y `direccion`, SHALL rechazar todo campo no declarado, incluido `id` o `cliente_id`, y la respuesta SHALL ser `PerfilRead` con `id`, `cliente_id`, `telefono` y `direccion`.
+
+#### Scenario: Creación de perfil para cliente existente
+- **WHEN** se envía un `PerfilCreate` válido a un cliente existente sin perfil
+- **THEN** el sistema responde 201 con el perfil creado y su `cliente_id` coincide con el id de la ruta
+
+#### Scenario: Segundo perfil es rechazado
+- **WHEN** se intenta crear otro perfil para un cliente que ya tiene uno
+- **THEN** el sistema responde 409 con un mensaje propio, sin detalles internos de la base (RN-09, RN-12; C-03)
+
+#### Scenario: Cliente ausente al crear perfil
+- **WHEN** se solicita `POST /clientes/{id}/perfil` para un id de cliente inexistente
+- **THEN** el sistema responde 404 antes de intentar crear un perfil
+
+#### Scenario: Campo no declarado en perfil no crea una fila
+- **WHEN** se envía `POST /clientes/{id}/perfil` con `id`, `cliente_id` u otro campo no declarado
+- **THEN** el sistema responde 422 y no crea un perfil
+
+### Requirement: Detalle de cliente con perfil singular
+El sistema SHALL responder `GET /clientes/{id}` con 200 y un `ClienteRead` que contenga `id`, `nombre`, `email` y `perfil` como un objeto `PerfilRead` o `null`. La relación perfil SHALL estar incluida sin carga perezosa y no SHALL presentarse como lista.
+
+#### Scenario: Cliente con perfil
+- **WHEN** se consulta un cliente existente que tiene perfil
+- **THEN** el sistema responde 200 con un único objeto `perfil` que contiene `id`, `cliente_id`, `telefono` y `direccion`
+
+#### Scenario: Cliente sin perfil
+- **WHEN** se consulta un cliente existente que todavía no tiene perfil
+- **THEN** el sistema responde 200 con `perfil: null`
+
+#### Scenario: Detalle de cliente inexistente
+- **WHEN** se consulta `GET /clientes/{id}` con un id que no existe
+- **THEN** el sistema responde 404
+
+### Requirement: Ventas resumidas y paginadas de un cliente
+El sistema SHALL responder `GET /clientes/{id}/ventas` con 200 y una lista paginada de `VentaResumenRead`, que contiene `id`, `cliente_id`, `fecha: datetime` y `total: Decimal`, sin `renglones` ni detalles de libros y sin representar `total` como `float`. SHALL ordenar por `Venta.id` antes de aplicar `offset` y `limit`, aceptar `limit` de 1 a 100 (20 por defecto) y `offset` mayor o igual que cero, y responder 404 si el cliente no existe.
+
+#### Scenario: Ventas del cliente sin renglones
+- **WHEN** se consulta el listado de ventas de un cliente existente con ventas y parámetros de paginación válidos
+- **THEN** el sistema responde 200 con hasta `limit` resúmenes desde `offset`, ordenados ascendentemente por `id`, con `fecha` datetime, `total` Decimal y sin `renglones`
+
+#### Scenario: Cliente existente sin ventas
+- **WHEN** se consulta el listado de ventas de un cliente existente que no tiene ventas
+- **THEN** el sistema responde 200 con una lista vacía
+
+#### Scenario: Paginación fuera de rango
+- **WHEN** se consulta el listado con `limit` menor que 1 o mayor que 100, o con `offset` negativo
+- **THEN** el sistema responde 422
+
+#### Scenario: Ventas de cliente inexistente
+- **WHEN** se consulta `GET /clientes/{id}/ventas` para un id que no existe
+- **THEN** el sistema responde 404

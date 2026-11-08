@@ -193,7 +193,7 @@ Paso │ Agente A (Backend Core) │ Agente B (Backend Aux)        │ Agente C 
   - `knowledge-base/10_preguntas_abiertas.md` §(4) — PENDIENTE
 
 ### [CH-06] `clientes-perfil`
-- **Estado**: `[ ]` pendiente
+- **Estado**: `[x]` completado
 - **Scope**: Clientes y perfil uno a uno (US-003, parte clientes)
   - Dueño potencial: Agente B (Backend Aux) — una sesión (~4-6 h)
   - Casos cubiertos: C-02 (email repetido → 409 propio), C-03 (segundo perfil para el mismo cliente → 409)
