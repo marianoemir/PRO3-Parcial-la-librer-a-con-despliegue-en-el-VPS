@@ -27,6 +27,7 @@ from app.core.database import create_engine, create_session_factory
 from app.modules.autores.router import router as autores_router
 from app.modules.editoriales.router import router as editoriales_router
 from app.modules.generos.router import router as generos_router
+from app.modules.clientes.router import router as clientes_router
 from app.modules.health.router import router as health_router
 from app.modules.libros.router import router as libros_router
 
@@ -63,6 +64,7 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
 
 app = FastAPI(lifespan=lifespan)
 app.include_router(health_router)
+app.include_router(clientes_router)
 app.include_router(libros_router)
 app.include_router(editoriales_router)
 app.include_router(generos_router)
