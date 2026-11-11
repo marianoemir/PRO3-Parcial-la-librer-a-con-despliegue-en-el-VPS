@@ -44,7 +44,7 @@ Fuente: `knowledge-base/02_descripcion_general.md`. Stack impuesto — no cambia
 
 ## Roadmap de Changes
 
-Ver `CHANGES.md` (CH-01 a CH-13, 4–6 h por change; CH-13 es rectificación aplicada). Camino crítico pendiente: **CH-01 → CH-02 → CH-05 → CH-07 → CH-08 → CH-11 → CH-12**. Primer change pendiente: **CH-07 ventas-renglones** (CH-05 y CH-06 ya completados; CH-13 aplicada sobre ambos). Los modelos/esquema (CH-02) van antes de cualquier service/router. Docker/VPS/evidencia son changes propios (CH-03, CH-10, CH-11, CH-12).
+Ver `CHANGES.md` (CH-01 a CH-13, 4–6 h por change; CH-13 es rectificación aplicada). Camino crítico pendiente: **CH-10 → CH-11 → CH-12** (CH-09 corre en paralelo y también bloquea CH-12). Primer change pendiente: **CH-09 casos-http-C** (CH-01 a CH-08 y CH-13 ya completados). Los modelos/esquema (CH-02) van antes de cualquier service/router. Docker/VPS/evidencia son changes propios (CH-03, CH-10, CH-11, CH-12).
 
 ## Reglas Duras (específicas del proyecto)
 
