@@ -1,0 +1,101 @@
+@base = http://127.0.0.1:8000
+
+# CH-09 — Casos C de contratos y restricciones aún no cubiertos.
+#
+# Prerrequisito operativo obligatorio: usar una base local dedicada, vacía y
+# autorizada para pruebas. Iniciar la API una vez para que el lifespan cree el
+# esquema; después ejecutar `python -m app.seed` y volver a dejar la API en
+# escucha en @base. Este archivo no crea, elimina ni reinicia bases.
+#
+# Orden del ciclo limpio: C-01, C-02, C-03, C-04, C-08, luego reutilizar sin
+# editar C-05 desde `test/ch07-ventas-errores.http`, C-06 desde
+# `test/ch08-seed-datos-iniciales.http`, y C-07 desde
+# `test/ch09-c07-consultas-fijas.http`.
+#
+# No duplicar solicitudes de C-05, C-06 ni los rangos de CH-13: pertenecen a
+# sus archivos propietarios. Los valores de fixture de este archivo requieren
+# exclusivamente el seed indicado arriba.
+
+### C-01 — path no entero: FastAPI debe rechazar antes del handler
+# Esperado: 422 con cuerpo público de validación; no se espera detalle de BD.
+GET {{base}}/libros/no-es-entero
+
+### C-02a — ISBN del libro 1 repetido con el resto del cuerpo válido
+# Esperado: 409 y `detail` propio; no debe incluir SQL, constraint, traceback,
+# asyncpg ni nombres de tablas.
+POST {{base}}/libros/
+Content-Type: application/json
+
+{
+  "isbn": "978-950-00-0001-1",
+  "titulo": "CH09 ISBN duplicado",
+  "precio": "12345.67",
+  "stock": 1,
+  "editorial_id": 1,
+  "genero_id": 1,
+  "autores": [
+    {"autor_id": 1, "rol": "autor", "orden": 1}
+  ]
+}
+
+### C-02b — email del cliente 2 repetido con cuerpo por lo demás válido
+# Esperado: 409 y `detail` propio; no debe incluir SQL, constraint, traceback,
+# asyncpg ni nombres de tablas.
+POST {{base}}/clientes/
+Content-Type: application/json
+
+{
+  "nombre": "CH09 Email duplicado",
+  "email": "bruno.diaz@example.com"
+}
+
+### C-03 — segundo perfil para el cliente 1, que ya lo tiene en el seed
+# Esperado: 409 con `detail` propio y sin internals de base.
+POST {{base}}/clientes/1/perfil
+Content-Type: application/json
+
+{
+  "telefono": "+54 11 5555-0909",
+  "direccion": "Dirección de prueba CH09"
+}
+
+### C-04a — editorial inexistente dentro de int4
+# Esperado: 409 con `detail` propio; no debe incluir SQL, constraint, traceback,
+# asyncpg ni nombres de tablas. El ISBN es exclusivo para que la FK sea el error.
+POST {{base}}/libros/
+Content-Type: application/json
+
+{
+  "isbn": "978-CH09-C04-EDITORIAL",
+  "titulo": "CH09 Editorial inexistente",
+  "precio": "100.00",
+  "stock": 1,
+  "editorial_id": 2147483647,
+  "genero_id": 1,
+  "autores": [
+    {"autor_id": 1, "rol": "autor", "orden": 1}
+  ]
+}
+
+### C-04b — autor inexistente dentro de int4
+# Esperado: 409 con `detail` propio y sin internals de base. El ISBN y la
+# editorial son válidos para que la FK de autoría sea el error observado.
+POST {{base}}/libros/
+Content-Type: application/json
+
+{
+  "isbn": "978-CH09-C04-AUTOR",
+  "titulo": "CH09 Autor inexistente",
+  "precio": "100.00",
+  "stock": 1,
+  "editorial_id": 1,
+  "genero_id": 1,
+  "autores": [
+    {"autor_id": 2147483647, "rol": "autor", "orden": 1}
+  ]
+}
+
+### C-08 — intento de inyección en filtro de título
+# Esperado: 200 y lista JSON vacía (`[]`) con el seed cargado. No debe devolver
+# todos los libros ni un error de SQL.
+GET {{base}}/libros/?titulo=%27%20OR%20%271%27%3D%271
