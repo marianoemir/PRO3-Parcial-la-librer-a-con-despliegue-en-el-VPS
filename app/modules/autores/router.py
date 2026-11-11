@@ -23,6 +23,9 @@ from app.modules.autores.schemas import (
 
 router = APIRouter(prefix="/autores", tags=["autores"])
 
+# Tope de INTEGER (int4): sin él, un id u offset mayor llega a la base y da 500.
+_INT4_MAX = 2147483647
+
 SessionDep = Annotated[AsyncSession, Depends(get_session)]
 
 
@@ -33,7 +36,7 @@ async def crear_autor(session: SessionDep, datos: AutorCreate) -> AutorRead:
 
 @router.get("/{autor_id}", response_model=AutorRead)
 async def obtener_autor(
-    session: SessionDep, autor_id: Annotated[int, Path()]
+    session: SessionDep, autor_id: Annotated[int, Path(le=_INT4_MAX)]
 ) -> AutorRead:
     return await service.obtener_autor(session, autor_id)
 
@@ -41,7 +44,7 @@ async def obtener_autor(
 @router.patch("/{autor_id}", response_model=AutorRead)
 async def actualizar_autor(
     session: SessionDep,
-    autor_id: Annotated[int, Path()],
+    autor_id: Annotated[int, Path(le=_INT4_MAX)],
     datos: AutorUpdate,
 ) -> AutorRead:
     return await service.actualizar_autor(session, autor_id, datos)
@@ -50,9 +53,9 @@ async def actualizar_autor(
 @router.get("/{autor_id}/libros", response_model=list[LibroDeAutorRead])
 async def listar_libros_de_autor(
     session: SessionDep,
-    autor_id: Annotated[int, Path()],
+    autor_id: Annotated[int, Path(le=_INT4_MAX)],
     limit: Annotated[int, Query(ge=1, le=100)] = 20,
-    offset: Annotated[int, Query(ge=0)] = 0,
+    offset: Annotated[int, Query(ge=0, le=_INT4_MAX)] = 0,
 ) -> list[LibroDeAutorRead]:
     return await service.listar_libros_de_autor(
         session, autor_id, limit=limit, offset=offset
