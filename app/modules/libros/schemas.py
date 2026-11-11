@@ -14,6 +14,8 @@ from typing import Literal
 from pydantic import AliasChoices, ConfigDict, field_validator
 from sqlmodel import Field, SQLModel
 
+from app.core.constants import INT4_MAX
+
 
 class EditorialResumen(SQLModel):
     model_config = ConfigDict(from_attributes=True)
@@ -38,18 +40,18 @@ class AutorResumen(SQLModel):
 
 
 class LibroAutorCreate(SQLModel):
-    autor_id: int = Field(ge=1, le=2147483647)
+    autor_id: int = Field(ge=1, le=INT4_MAX)
     rol: Literal["autor", "coautor", "traductor", "ilustrador"]
-    orden: int = Field(ge=1)
+    orden: int = Field(ge=1, le=INT4_MAX)
 
 
 class LibroCreate(SQLModel):
     isbn: str
     titulo: str
     precio: Decimal = Field(gt=0, max_digits=10, decimal_places=2)
-    stock: int = Field(ge=0, le=2147483647)
-    editorial_id: int = Field(ge=1, le=2147483647)
-    genero_id: int | None = Field(default=None, ge=1, le=2147483647)
+    stock: int = Field(ge=0, le=INT4_MAX)
+    editorial_id: int = Field(ge=1, le=INT4_MAX)
+    genero_id: int | None = Field(default=None, ge=1, le=INT4_MAX)
     autores: list[LibroAutorCreate]
 
 
@@ -57,9 +59,9 @@ class LibroUpdate(SQLModel):
     isbn: str | None = None
     titulo: str | None = None
     precio: Decimal | None = Field(default=None, gt=0, max_digits=10, decimal_places=2)
-    stock: int | None = Field(default=None, ge=0, le=2147483647)
-    editorial_id: int | None = Field(default=None, ge=1, le=2147483647)
-    genero_id: int | None = Field(default=None, ge=1, le=2147483647)
+    stock: int | None = Field(default=None, ge=0, le=INT4_MAX)
+    editorial_id: int | None = Field(default=None, ge=1, le=INT4_MAX)
+    genero_id: int | None = Field(default=None, ge=1, le=INT4_MAX)
 
     @field_validator("isbn", "titulo", "precio", "stock", "editorial_id", mode="before")
     @classmethod

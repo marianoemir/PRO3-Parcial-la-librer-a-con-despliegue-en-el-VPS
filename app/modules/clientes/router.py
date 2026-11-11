@@ -5,6 +5,7 @@ from typing import Annotated
 from fastapi import APIRouter, Depends, Path, Query, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.core.constants import INT4_MAX
 from app.core.database import get_session
 from app.modules.clientes import service
 from app.modules.clientes.schemas import (
@@ -19,9 +20,9 @@ from app.modules.clientes.schemas import (
 router = APIRouter(prefix="/clientes", tags=["clientes"])
 
 SessionDep = Annotated[AsyncSession, Depends(get_session)]
-ClienteId = Annotated[int, Path()]
+ClienteId = Annotated[int, Path(le=INT4_MAX)]
 Limit = Annotated[int, Query(ge=1, le=100)]
-Offset = Annotated[int, Query(ge=0)]
+Offset = Annotated[int, Query(ge=0, le=INT4_MAX)]
 
 
 @router.post("/", response_model=ClienteRead, status_code=status.HTTP_201_CREATED)

@@ -1,0 +1,95 @@
+@base = http://127.0.0.1:8000
+
+### 422 - GET libro id fuera de rango int4 (path)
+GET {{base}}/libros/99999999999
+
+### 422 - PATCH libro id fuera de rango int4 (path)
+PATCH {{base}}/libros/99999999999
+Content-Type: application/json
+
+{
+  "titulo": "Titulo valido"
+}
+
+### 422 - GET libros offset fuera de rango int4 (query)
+GET {{base}}/libros/?offset=99999999999
+
+### 422 - GET libros genero_id fuera de rango int4 (query)
+GET {{base}}/libros/?genero_id=99999999999
+
+### 422 - POST libro con editorial_id fuera de rango int4 (body)
+POST {{base}}/libros/
+Content-Type: application/json
+
+{
+  "isbn": "978-CH13-INT4-POST",
+  "titulo": "Libro overflow editorial",
+  "precio": "10.00",
+  "stock": 1,
+  "editorial_id": 99999999999,
+  "genero_id": null,
+  "autores": []
+}
+
+### 422 - POST libro con genero_id fuera de rango int4 (body)
+POST {{base}}/libros/
+Content-Type: application/json
+
+{
+  "isbn": "978-CH13-INT4-GEN",
+  "titulo": "Libro overflow genero",
+  "precio": "10.00",
+  "stock": 1,
+  "editorial_id": 1,
+  "genero_id": 99999999999,
+  "autores": []
+}
+
+### 422 - POST libro con autor_id fuera de rango int4 (body)
+POST {{base}}/libros/
+Content-Type: application/json
+
+{
+  "isbn": "978-CH13-INT4-AUT",
+  "titulo": "Libro overflow autor",
+  "precio": "10.00",
+  "stock": 1,
+  "editorial_id": 1,
+  "genero_id": null,
+  "autores": [
+    {"autor_id": 99999999999, "rol": "autor", "orden": 1}
+  ]
+}
+
+### 422 - POST libro con orden de autoría fuera de rango int4 (body)
+POST {{base}}/libros/
+Content-Type: application/json
+
+{
+  "isbn": "978-CH13-INT4-ORD",
+  "titulo": "Libro overflow orden autoria",
+  "precio": "10.00",
+  "stock": 1,
+  "editorial_id": 1,
+  "genero_id": null,
+  "autores": [
+    {"autor_id": 1, "rol": "autor", "orden": 99999999999}
+  ]
+}
+
+### 422 - PATCH libro con editorial_id fuera de rango int4 (body)
+PATCH {{base}}/libros/1
+Content-Type: application/json
+
+{
+  "editorial_id": 99999999999
+}
+
+### Control 404 - GET libro id 0 (no overflow)
+GET {{base}}/libros/0
+
+### Control 404 - GET libro id int4 max (inexistente esperado si no existe)
+GET {{base}}/libros/2147483647
+
+### 422 - GET libro id int4 max + 1
+GET {{base}}/libros/2147483648

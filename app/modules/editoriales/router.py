@@ -11,6 +11,7 @@ from typing import Annotated
 from fastapi import APIRouter, Depends, Path, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.core.constants import INT4_MAX
 from app.core.database import get_session
 from app.modules.editoriales import service
 from app.modules.editoriales.schemas import (
@@ -21,9 +22,6 @@ from app.modules.editoriales.schemas import (
 )
 
 router = APIRouter(prefix="/editoriales", tags=["editoriales"])
-
-# Tope de INTEGER (int4): sin él, un id u offset mayor llega a la base y da 500.
-_INT4_MAX = 2147483647
 
 SessionDep = Annotated[AsyncSession, Depends(get_session)]
 
@@ -39,14 +37,14 @@ async def crear_editorial(
 async def listar_editoriales(
     session: SessionDep,
     limit: Annotated[int, Query(ge=1, le=100)] = 20,
-    offset: Annotated[int, Query(ge=0, le=_INT4_MAX)] = 0,
+    offset: Annotated[int, Query(ge=0, le=INT4_MAX)] = 0,
 ) -> list[EditorialRead]:
     return await service.listar_editoriales(session, limit=limit, offset=offset)
 
 
 @router.get("/{editorial_id}", response_model=EditorialRead)
 async def obtener_editorial(
-    session: SessionDep, editorial_id: Annotated[int, Path(le=_INT4_MAX)]
+    session: SessionDep, editorial_id: Annotated[int, Path(le=INT4_MAX)]
 ) -> EditorialRead:
     return await service.obtener_editorial(session, editorial_id)
 
@@ -54,7 +52,7 @@ async def obtener_editorial(
 @router.patch("/{editorial_id}", response_model=EditorialRead)
 async def actualizar_editorial(
     session: SessionDep,
-    editorial_id: Annotated[int, Path(le=_INT4_MAX)],
+    editorial_id: Annotated[int, Path(le=INT4_MAX)],
     datos: EditorialUpdate,
 ) -> EditorialRead:
     return await service.actualizar_editorial(session, editorial_id, datos)
@@ -63,9 +61,9 @@ async def actualizar_editorial(
 @router.get("/{editorial_id}/libros", response_model=list[LibroDeEditorialRead])
 async def listar_libros_de_editorial(
     session: SessionDep,
-    editorial_id: Annotated[int, Path(le=_INT4_MAX)],
+    editorial_id: Annotated[int, Path(le=INT4_MAX)],
     limit: Annotated[int, Query(ge=1, le=100)] = 20,
-    offset: Annotated[int, Query(ge=0, le=_INT4_MAX)] = 0,
+    offset: Annotated[int, Query(ge=0, le=INT4_MAX)] = 0,
 ) -> list[LibroDeEditorialRead]:
     return await service.listar_libros_de_editorial(
         session, editorial_id, limit=limit, offset=offset
