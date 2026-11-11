@@ -1,0 +1,75 @@
+@base = http://127.0.0.1:8010
+# Datos creados vía API para evidencia (no se asumen IDs existentes):
+# editorial_id=8 (Editorial CH07, PY), genero_id=5 (Genero CH07), autor_id=5 (existente, "Autor Prueba 5")
+# cliente_id=11 (Cliente CH07, cliente.ch07@example.com)
+# libro_a_id=45 "Libro CH07 A" precio 25000.00 stock 10 isbn 978-CH07-0001
+# libro_b_id=46 "Libro CH07 B" precio 27000.00 stock 10 isbn 978-CH07-0002
+# libro_c_id=47 "Libro CH07 C" precio 20000.00 stock 10 isbn 978-CH07-0003 (para evidencia C-07 3 renglones)
+# Ventas creadas en verificación: venta_id=9 (2 renglones, total 77000.00), venta_id=11 (1 renglon), venta_id=12 (3 renglones)
+
+### C-06 (Task 4.2): POST venta exitosa - precios copiados del catálogo, total calculado por servidor
+# Esperado: 201
+# cliente {id:11,nombre:"Cliente CH07",email:"cliente.ch07@example.com"}
+# renglones: libro 45 cant 2 precio_unitario "25000.00" subtotal "50000.00", libro 46 cant 1 precio_unitario "27000.00" subtotal "27000.00"
+# total "77000.00", fecha asignada por servidor (timezone), sin precio_unitario/total/fecha aceptados del body
+POST {{base}}/ventas/
+Content-Type: application/json
+
+{
+  "cliente_id": 11,
+  "renglones": [
+    {"libro_id": 45, "cantidad": 2},
+    {"libro_id": 46, "cantidad": 1}
+  ]
+}
+
+### GET detalle venta (Task 4.1) - forma exacta con cliente y renglones precargados
+# Esperado: 200, misma forma VentaRead
+GET {{base}}/ventas/9
+
+### GET listado ventas paginado estable (Task 4.1)
+# Esperado: 200, lista ordenada por id asc, misma forma por elemento
+GET {{base}}/ventas/?limit=20&offset=0
+
+### D-07 evidencia (Task 3.2/4.5): aviso diferido en log tras POST exitoso
+# Verificación real (curl + consola uvicorn, uvicorn.error):
+# - Respuesta HTTP 201 recibida en TIME_AFTER_RESP=2026-11-11T15:12:01.2480043-03:00 (venta_id=11)
+# - Línea en evidencia/uvicorn-ch07.err.log: "INFO:     Aviso comprobante venta_id=11 email=cliente.ch07@example.com"
+# - Aparece ~0.75s después del response (TIME_AFTER_SLEEP evidencia ~0.9s tras request). No se cambió nivel de logger; se usó logging.getLogger("uvicorn.error").
+
+### C-07 evidencia (Task 4.5): consultas fijas sin N+1 (1 renglon vs 3 renglones)
+# Ver evidencia/C-07-ventas-consultas.txt (copiada de consola con SQL_ECHO=true, sin resumir)
+# GET /ventas/11 (1 renglon, libro 45): 2 SELECTs de datos (venta+cliente join, renglones+libro join IN venta_id) + ROLLBACK
+# GET /ventas/12 (3 renglones, libros 45,46,47): 2 SELECTs de datos (misma forma, [cached]) + ROLLBACK
+# Misma cantidad de consultas para resolver el detalle independientemente de la cantidad de renglones.
+
+### RN-06 (cierre): precio copiado al vender no cambia si cambia el precio del libro
+# Datos verificados: venta_id=11 incluye libro 45 ("Libro CH07 A") con precio_unitario "25000.00", total "25000.00".
+# 1) PATCH /libros/45 {"precio":"30000.00"} -> 200, libro queda en 30000.00 (evidencia curl real en reporte de cierre).
+# 2) GET /ventas/11 -> 200, renglón libro 45 sigue precio_unitario "25000.00" y total "25000.00" (sin recalcular).
+# 3) PATCH /libros/45 {"precio":"25000.00"} -> 200, precio restaurado (evidencia curl real).
+PATCH {{base}}/libros/45
+Content-Type: application/json
+
+{
+  "precio": "30000.00"
+}
+
+### RN-06 verificación lectura venta tras cambio de precio catálogo
+# Esperado: 200, renglón libro_id=45 conserva precio_unitario "25000.00" y total "25000.00" (venta 11).
+GET {{base}}/ventas/11
+
+### RN-06 restauración precio catálogo
+PATCH {{base}}/libros/45
+Content-Type: application/json
+
+{
+  "precio": "25000.00"
+}
+
+### Listado sin N+1 (cierre): GET /ventas/?limit=5 con >=3 ventas en la página
+# Ejecutado con SQL_ECHO=true (uvicorn). Salida de consultas copiada de consola (sin resumir) en reporte de cierre.
+# Observado: 2 SELECTs de datos para la página (venta+cliente con LIMIT/OFFSET; renglon_venta+libro con IN de 5 venta_id: 6,7,8,9,11) + ROLLBACK.
+# Conclusión: el número de SELECTs no depende de la cantidad de ventas/renglones en la página (carga anticipada joinedload/selectinload). Sin N+1.
+# Esperado: 200, lista ordenada por id asc con forma VentaRead (cliente y renglones precargados).
+GET {{base}}/ventas/?limit=5

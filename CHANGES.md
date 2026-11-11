@@ -218,7 +218,7 @@ Paso │ Agente A (Backend Core) │ Agente B (Backend Aux)        │ Agente C 
   - `knowledge-base/10_preguntas_abiertas.md` §(5) — PENDIENTE
 
 ### [CH-07] `ventas-renglones`
-- **Estado**: `[ ]` pendiente
+- **Estado**: `[x]` completado
 - **Scope**: Altas de ventas con renglones anidados, precios y total del servidor, aviso simulado (US-004, parte ventas + US-005 parcial)
   - Dueño potencial: Agente A (Backend Core) — una sesión (~4-6 h)
   - Casos cubiertos: C-05 (libro/cliente inexistente → 409), C-06 (venta válida de dos renglones → 201, precios copiados, total `77000.00`), C-07 parcial (detalle de venta sin N+1), D-07 (mensaje del aviso en `docker logs` tras el alta)
