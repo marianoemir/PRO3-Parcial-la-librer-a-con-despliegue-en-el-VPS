@@ -77,7 +77,7 @@ El comando imprime un resumen por tabla con las filas insertadas y las que ya
 existían, más los ids del dataset, y termina con código de salida `0`. No
 levanta la API ni abre puertos, y nunca imprime `DATABASE_URL` ni credenciales.
 En Windows, si el resumen muestra mal los acentos, ejecutar con
-`set PYTHONIOENCODING=utf-8` (o usar Windows Terminal con UTF-8).
+`$env:PYTHONIOENCODING="utf-8"` (o usar Windows Terminal con UTF-8).
 
 ### Cómo se ejecuta en el VPS (contenedor)
 
