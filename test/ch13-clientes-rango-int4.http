@@ -1,0 +1,39 @@
+@base = http://127.0.0.1:8000
+
+### 422 - GET cliente id fuera de rango int4
+GET {{base}}/clientes/99999999999
+
+### 422 - PATCH cliente id fuera de rango int4
+PATCH {{base}}/clientes/99999999999
+Content-Type: application/json
+
+{
+  "nombre": "Nombre valido"
+}
+
+### 422 - POST perfil con cliente_id ruta fuera de rango int4
+POST {{base}}/clientes/99999999999/perfil
+Content-Type: application/json
+
+{
+  "telefono": "555-0000",
+  "direccion": "Calle Falsa 123"
+}
+
+### 422 - GET ventas de cliente con cliente_id ruta fuera de rango int4
+GET {{base}}/clientes/99999999999/ventas
+
+### 422 - GET ventas de cliente con offset fuera de rango int4
+GET {{base}}/clientes/1/ventas?offset=99999999999
+
+### Control 404 - GET cliente id 0 (no overflow)
+GET {{base}}/clientes/0
+
+### Control 404 - GET perfil/ventas de cliente id 0
+GET {{base}}/clientes/0/perfil
+
+### Control 404 - GET cliente id int4 max (inexistente esperado si no existe)
+GET {{base}}/clientes/2147483647
+
+### 422 - GET cliente id int4 max + 1
+GET {{base}}/clientes/2147483648

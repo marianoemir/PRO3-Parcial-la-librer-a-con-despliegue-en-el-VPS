@@ -17,6 +17,12 @@
 
 ---
 
+## Rectificaciones
+
+- **CH-13 `ch-13-validacion-rango-int4` (aplicado):** corrige de forma transversal el bug de validación de rango `int4` detectado tras CH-04 en los módulos implementados de **CH-05 (`libros-autorias`)** y **CH-06 (`clientes-perfil`)**: ids de ruta, `offset`/`genero_id` de listados y body ids/enteros de entrada (incluido `autores[].orden`) fuera de rango (`> 2147483647`, ej. `99999999999`) responden **422** sin ejecutar handler/consulta de negocio y sin exponer internos de la base (RN-12). `id == 0` mantiene 404 donde la inexistencia la resuelve el service (decisión CH-05). **Ventas queda excluida del alcance de CH-13** porque `app/modules/ventas/` existe solo como stubs y CH-07 (`ventas-renglones`) está pendiente: el change propio de ventas (CH-07) debe nacer con estos límites `int4` desde su origen (path `GET /ventas/{id}`, `offset`/`limit` RN-10 en `GET /ventas/`, body ids `cliente_id` y `renglones[].libro_id`, `id==0`→404, 422 sin internals y sin pre-check RT-02/DD-04). Artefactos: `openspec/changes/ch-13-validacion-rango-int4/` (alcance reducido a libros/clientes).
+
+---
+
 ## Árbol de dependencias
 
 ```
@@ -26,8 +32,9 @@ CH-01 foundation-setup
   │     │
   │     ├── CH-04 crud-editoriales-generos-autores
   │     ├── CH-05 libros-autorias
+  │     │     └── CH-13 validacion-rango-int4 (rectificación aplicada, CH-05 ✓ + CH-06 ✓)
   │     └── CH-06 clientes-perfil
-  │           │
+  │           ├── CH-13 validacion-rango-int4 (ver arriba)
   │           └── CH-07 ventas-renglones (CH-05 ✓ + CH-06 ✓)
   │                    │
   │                    └── CH-08 seed-datos-iniciales
@@ -79,7 +86,7 @@ GATE 6: CH-09 ✓ + CH-11 ✓
 CH-01 → CH-02 → CH-05 → CH-07 → CH-08 → CH-11 → CH-12
 ```
 
-> `CH-09` corre en paralelo con `CH-11` y **también bloquea** el cierre (`CH-12` espera a `CH-09` y `CH-11`); por eso no aparece en la cadena lineal, pero ningún change de cierre puede saltearlo. `CH-03` y `CH-04` / `CH-06` son paralelos que adelantan el despliegue y la cobertura, no el mínimo irreducible. `CH-10` (despliegue-vps-inicial) corre temprano en paralelo tras `CH-02`+`CH-03` para detectar problemas de red/`host.docker.internal` antes de los datos; `CH-11` espera a `CH-10` y a `CH-08`.
+> `CH-09` corre en paralelo con `CH-11` y **también bloquea** el cierre (`CH-12` espera a `CH-09` y `CH-11`); por eso no aparece en la cadena lineal, pero ningún change de cierre puede saltearlo. `CH-03` y `CH-04` / `CH-06` son paralelos que adelantan el despliegue y la cobertura, no el mínimo irreducible. `CH-10` (despliegue-vps-inicial) corre temprano en paralelo tras `CH-02`+`CH-03` para detectar problemas de red/`host.docker.internal` antes de los datos; `CH-11` espera a `CH-10` y a `CH-08`. `CH-13` (rectificación aplicada) depende de `CH-05` y `CH-06` y no altera el camino crítico pendiente.
 
 ### Plan óptimo con 3 agentes
 
@@ -316,3 +323,19 @@ Paso │ Agente A (Backend Core) │ Agente B (Backend Aux)        │ Agente C 
   - `knowledge-base/06_funcionalidades.md` §Casos de prueba mínimos (C-07: evidencia en consola)
   - `knowledge-base/01_vision_y_objetivos.md` §Alcance v1.0 y §Métricas de éxito
   - `knowledge-base/09_decisiones_y_supuestos.md` §SU-03 (entrega sin secretos)
+
+---
+
+## Rectificación aplicada (fuera de fase original)
+
+### [CH-13] `ch-13-validacion-rango-int4`
+- **Estado**: `[x]` completado (aplicado)
+- **Scope**: Rectificación transversal de validación de rango PostgreSQL `int4` (`INT4_MAX = 2147483647`) en módulos implementados de **CH-05 (`libros-autorias`)** y **CH-06 (`clientes-perfil`)**. Endurece ids de ruta, `offset` y filtro `genero_id` en query params, y body ids/enteros de entrada (`editorial_id`, `genero_id`, `autor_id`, `autores[].orden`, `stock`) para responder **422** por validación declarativa antes de ejecutar handler/consulta/escritura, sin exponer internals de base (RN-12). Mantiene `id == 0` → 404 cuando la inexistencia la resuelve el service. **Ventas excluido** (CH-07 pendiente/stubs): el change propio de ventas debe nacer con estos límites desde su origen.
+  - Casos/cobertura: overflow de path/query/body en libros/clientes → 422 sin `DataError`/`Traceback`/`asyncpg`/SQL; controles `GET /libros/0` y `GET /clientes/0` → 404; filtros/listados válidos dentro de rango siguen operando (ej. `GET /libros/?genero_id=1` → 200).
+  - Artefactos: `openspec/changes/ch-13-validacion-rango-int4/` (proposal, design, tasks, specs) y `test/ch13-libros-rango-int4.http`, `test/ch13-clientes-rango-int4.http`.
+- **Dependencias**: CH-05, CH-06
+- **Governance**: BAJO
+- **Leer antes**:
+  - `openspec/changes/ch-13-validacion-rango-int4/proposal.md`, `design.md`, `tasks.md` y deltas en `specs/`
+  - `knowledge-base/05_reglas_de_negocio.md` (RN-10, RN-12, RT-01, RT-02)
+  - `knowledge-base/06_funcionalidades.md` (contratos de libros/clientes) y `knowledge-base/09_decisiones_y_supuestos.md` (DD-04)

@@ -13,6 +13,7 @@ from typing import Annotated
 from fastapi import APIRouter, Depends, Path, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.core.constants import INT4_MAX
 from app.core.database import get_session
 from app.modules.generos import service
 from app.modules.generos.schemas import (
@@ -22,9 +23,6 @@ from app.modules.generos.schemas import (
 )
 
 router = APIRouter(prefix="/generos", tags=["generos"])
-
-# Tope de INTEGER (int4): sin él, un id u offset mayor llega a la base y da 500.
-_INT4_MAX = 2147483647
 
 SessionDep = Annotated[AsyncSession, Depends(get_session)]
 
@@ -38,14 +36,14 @@ async def crear_genero(session: SessionDep, datos: GeneroCreate) -> GeneroRead:
 async def listar_generos(
     session: SessionDep,
     limit: Annotated[int, Query(ge=1, le=100)] = 20,
-    offset: Annotated[int, Query(ge=0, le=_INT4_MAX)] = 0,
+    offset: Annotated[int, Query(ge=0, le=INT4_MAX)] = 0,
 ) -> list[GeneroRead]:
     return await service.listar_generos(session, limit=limit, offset=offset)
 
 
 @router.get("/{genero_id}", response_model=GeneroRead)
 async def obtener_genero(
-    session: SessionDep, genero_id: Annotated[int, Path(le=_INT4_MAX)]
+    session: SessionDep, genero_id: Annotated[int, Path(le=INT4_MAX)]
 ) -> GeneroRead:
     return await service.obtener_genero(session, genero_id)
 
@@ -53,9 +51,9 @@ async def obtener_genero(
 @router.get("/{genero_id}/libros", response_model=list[LibroDeGeneroRead])
 async def listar_libros_de_genero(
     session: SessionDep,
-    genero_id: Annotated[int, Path(le=_INT4_MAX)],
+    genero_id: Annotated[int, Path(le=INT4_MAX)],
     limit: Annotated[int, Query(ge=1, le=100)] = 20,
-    offset: Annotated[int, Query(ge=0, le=_INT4_MAX)] = 0,
+    offset: Annotated[int, Query(ge=0, le=INT4_MAX)] = 0,
 ) -> list[LibroDeGeneroRead]:
     return await service.listar_libros_de_genero(
         session, genero_id, limit=limit, offset=offset

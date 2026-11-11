@@ -5,6 +5,7 @@ from typing import Annotated
 from fastapi import APIRouter, Depends, Path, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.core.constants import INT4_MAX
 from app.core.database import get_session
 from app.modules.libros import service
 from app.modules.libros.schemas import (
@@ -28,9 +29,9 @@ async def crear_libro(session: SessionDep, datos: LibroCreate) -> LibroRead:
 async def listar_libros(
     session: SessionDep,
     limit: Annotated[int, Query(ge=1, le=100)] = 20,
-    offset: Annotated[int, Query(ge=0)] = 0,
+    offset: Annotated[int, Query(ge=0, le=INT4_MAX)] = 0,
     titulo: Annotated[str | None, Query()] = None,
-    genero_id: Annotated[int | None, Query()] = None,
+    genero_id: Annotated[int | None, Query(le=INT4_MAX)] = None,
 ) -> list[LibroListRead]:
     return await service.listar_libros(
         session, limit=limit, offset=offset, titulo=titulo, genero_id=genero_id
@@ -39,7 +40,7 @@ async def listar_libros(
 
 @router.get("/{libro_id}", response_model=LibroRead)
 async def obtener_libro(
-    session: SessionDep, libro_id: Annotated[int, Path()]
+    session: SessionDep, libro_id: Annotated[int, Path(le=INT4_MAX)]
 ) -> LibroRead:
     return await service.obtener_libro(session, libro_id)
 
@@ -47,7 +48,7 @@ async def obtener_libro(
 @router.patch("/{libro_id}", response_model=LibroRead)
 async def actualizar_libro(
     session: SessionDep,
-    libro_id: Annotated[int, Path()],
+    libro_id: Annotated[int, Path(le=INT4_MAX)],
     datos: LibroUpdate,
 ) -> LibroRead:
     return await service.actualizar_libro(session, libro_id, datos)
