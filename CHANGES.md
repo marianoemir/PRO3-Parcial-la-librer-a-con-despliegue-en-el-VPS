@@ -158,7 +158,7 @@ Paso │ Agente A (Backend Core) │ Agente B (Backend Aux)        │ Agente C 
 > CH-04, CH-05 y CH-06 son independientes entre sí (solo dependen de CH-02) y pueden proponerse en paralelo. CH-07 exige CH-05 y CH-06.
 
 ### [CH-04] `crud-editoriales-generos-autores`
-- **Estado**: `[ ]` pendiente
+- **Estado**: `[x]` completado
 - **Scope**: Recursos de referencia simples con DTO separados (US-003, parte editorial/género/autor)
   - Dueño potencial: Agente B (Backend Aux) — una sesión (~4-6 h)
   - Casos cubiertos: habilita el caso C-04 (las editoriales/autores existen como recursos para el caso FK de libros)
