@@ -1,0 +1,119 @@
+@base = http://127.0.0.1:8010
+# IDs creados para evidencia CH-07 (no asumir existentes): cliente_id=11, editorial_id=8, genero_id=5, autor_id=5, libro_a_id=45 (25000.00), libro_b_id=46 (27000.00)
+
+### 422 - POST venta renglones vacíos (Task 1.1)
+POST {{base}}/ventas/
+Content-Type: application/json
+
+{
+  "cliente_id": 11,
+  "renglones": []
+}
+
+### 422 - POST venta libro repetido (Task 1.1)
+POST {{base}}/ventas/
+Content-Type: application/json
+
+{
+  "cliente_id": 11,
+  "renglones": [
+    {"libro_id": 45, "cantidad": 1},
+    {"libro_id": 45, "cantidad": 2}
+  ]
+}
+
+### 422 - POST venta campo prohibido precio_unitario (Task 1.1)
+POST {{base}}/ventas/
+Content-Type: application/json
+
+{
+  "cliente_id": 11,
+  "precio_unitario": "10.00",
+  "renglones": [{"libro_id": 45, "cantidad": 1}]
+}
+
+### 422 - POST venta campo prohibido total (Task 1.1)
+POST {{base}}/ventas/
+Content-Type: application/json
+
+{
+  "cliente_id": 11,
+  "total": "10.00",
+  "renglones": [{"libro_id": 45, "cantidad": 1}]
+}
+
+### 422 - POST venta campo prohibido fecha (Task 1.1)
+POST {{base}}/ventas/
+Content-Type: application/json
+
+{
+  "cliente_id": 11,
+  "fecha": "2026-01-01T00:00:00Z",
+  "renglones": [{"libro_id": 45, "cantidad": 1}]
+}
+
+### 422 - POST venta total desbordado NUMERIC(12,2) (Task 2.2, decisión design)
+# Esperado: 422 controlado {"detail":"El total de la venta excede el máximo permitido"}, sin DataError/internals
+POST {{base}}/ventas/
+Content-Type: application/json
+
+{
+  "cliente_id": 11,
+  "renglones": [{"libro_id": 45, "cantidad": 999999}]
+}
+
+### 404 - GET venta id 0 inexistente (Task 3.3/4.4)
+# Esperado: 404 {"detail":"Venta no encontrada"}
+GET {{base}}/ventas/0
+
+### 422 - GET venta id fuera de int4 (Task 3.3/4.4)
+# Esperado: 422 validación path.venta_id le=2147483647, sin internals
+GET {{base}}/ventas/99999999999
+
+### 422 - GET ventas paginación limit=0
+# Esperado: 422 validación query.limit ge=1
+GET {{base}}/ventas/?limit=0
+
+### 422 - GET ventas paginación limit=101
+# Esperado: 422 validación query.limit le=100
+GET {{base}}/ventas/?limit=101
+
+### 422 - GET ventas paginación offset=-1
+# Esperado: 422 validación query.offset ge=0
+GET {{base}}/ventas/?offset=-1
+
+### 422 - POST venta cliente_id fuera de int4 (Task 4.4)
+# Esperado: 422 validación body, sin internals ni pre-checks
+POST {{base}}/ventas/
+Content-Type: application/json
+
+{
+  "cliente_id": 99999999999,
+  "renglones": [{"libro_id": 45, "cantidad": 1}]
+}
+
+### 422 - POST venta libro_id fuera de int4 (Task 4.4)
+# Esperado: 422 validación body, sin internals ni pre-checks
+POST {{base}}/ventas/
+Content-Type: application/json
+
+{
+  "cliente_id": 11,
+  "renglones": [{"libro_id": 99999999999, "cantidad": 1}]
+}
+
+### 422 - POST venta cantidad fuera de int4 (Task 4.4)
+# Esperado: 422 validación body, sin internals ni pre-checks
+POST {{base}}/ventas/
+Content-Type: application/json
+
+{
+  "cliente_id": 11,
+  "renglones": [{"libro_id": 45, "cantidad": 99999999999}]
+}
+
+### Evidencia/listado sin N+1 (cierre) - referencia cruzada
+# Ver test/ch07-ventas-exito.http: "Listado sin N+1 (cierre)..." y salida real de consola SQL en reporte.
+# GET /ventas/?limit=5 con >=3 ventas en página -> 2 SELECTs de datos (no depende de cantidad de ventas/renglones). Sin corrección de código requerida.
+GET {{base}}/ventas/?limit=5
+

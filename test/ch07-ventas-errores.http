@@ -1,0 +1,46 @@
+@base = http://127.0.0.1:8010
+# IDs creados para evidencia CH-07: cliente_id=11, libro_a_id=45 (25000.00), libro_b_id=46 (27000.00)
+
+### 409 - POST venta con cliente_id inexistente (C-05 / Task 2.3)
+# Esperado: 409 con mensaje propio {"detail":"La referencia indicada no existe o hay un conflicto de datos"}, sin internals de BD
+POST {{base}}/ventas/
+Content-Type: application/json
+
+{
+  "cliente_id": 999999,
+  "renglones": [{"libro_id": 45, "cantidad": 1}]
+}
+
+### 409 - POST venta con libro_id inexistente en renglones (C-05 / Task 2.1)
+# Esperado: 409 con mensaje propio {"detail":"El libro indicado no existe"}, sin internals de BD
+POST {{base}}/ventas/
+Content-Type: application/json
+
+{
+  "cliente_id": 11,
+  "renglones": [{"libro_id": 999999, "cantidad": 1}]
+}
+
+### 422 - POST venta renglones vacíos (Task 4.3)
+# Esperado: 422 validación (min_length renglones)
+POST {{base}}/ventas/
+Content-Type: application/json
+
+{
+  "cliente_id": 11,
+  "renglones": []
+}
+
+### 422 - POST venta libro repetido (Task 4.3)
+# Esperado: 422 "No se permiten libros repetidos en los renglones"
+POST {{base}}/ventas/
+Content-Type: application/json
+
+{
+  "cliente_id": 11,
+  "renglones": [
+    {"libro_id": 45, "cantidad": 1},
+    {"libro_id": 45, "cantidad": 2}
+  ]
+}
+

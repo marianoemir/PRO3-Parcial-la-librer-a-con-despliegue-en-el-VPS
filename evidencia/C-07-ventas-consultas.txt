@@ -1,0 +1,53 @@
+﻿EVIDENCIA C-07 CH-07
+Venta 1 renglon: GET /ventas/11 (cliente_id=11, 1 renglon libro_id=45)
+Venta 3 renglones: GET /ventas/12 (cliente_id=11, 3 renglones libro_id=45,46,47)
+Salida copiada de consola (uvicorn con SQL_ECHO=true), sin resumir.
+---
+python.exe : INFO:     Started server process [15280]
+En línea: 1 Carácter: 23
++ ... CHO='true'; & '.\.venv\Scripts\python.exe' -m uvicorn app.main:app -- ...
++                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (INFO:     Started server process [15280]:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+INFO:     Waiting for application startup.
+2026-11-11 15:12:58,610 INFO sqlalchemy.engine.Engine select pg_catalog.version()
+2026-11-11 15:12:58,610 INFO sqlalchemy.engine.Engine [raw sql] ()
+2026-11-11 15:12:58,611 INFO sqlalchemy.engine.Engine select current_schema()
+2026-11-11 15:12:58,611 INFO sqlalchemy.engine.Engine [raw sql] ()
+2026-11-11 15:12:58,612 INFO sqlalchemy.engine.Engine show standard_conforming_strings
+2026-11-11 15:12:58,612 INFO sqlalchemy.engine.Engine [raw sql] ()
+2026-11-11 15:12:58,613 INFO sqlalchemy.engine.Engine BEGIN (implicit)
+2026-11-11 15:12:58,615 INFO sqlalchemy.engine.Engine SELECT pg_catalog.pg_class.relname 
+FROM pg_catalog.pg_class JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_class.relnamespace 
+WHERE pg_catalog.pg_class.relname IN ($7::VARCHAR, $8::VARCHAR, $9::VARCHAR, $10::VARCHAR, $11::VARCHAR, $12::VARCHAR, $13::VARCHAR, $14::VARCHAR, $15::VARCHAR) AND pg_catalog.pg_class.relkind = ANY (ARRAY[$1::VARCHAR, $2::VARCHAR, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR]) AND pg_catalog.pg_table_is_visible(pg_catalog.pg_class.oid) AND pg_catalog.pg_namespace.nspname != $6::VARCHAR
+2026-11-11 15:12:58,615 INFO sqlalchemy.engine.Engine [generated in 0.00023s] ('r', 'p', 'f', 'v', 'm', 'pg_catalog', 'autor', 'libro', 'libro_autor', 'editorial', 'genero', 'cliente', 'perfil_cliente', 'venta', 'renglon_venta')
+2026-11-11 15:12:58,621 INFO sqlalchemy.engine.Engine COMMIT
+INFO:     Arranque completado; tablas creadas: ['autor', 'cliente', 'editorial', 'genero', 'libro', 'libro_autor', 
+'perfil_cliente', 'renglon_venta', 'venta']
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://127.0.0.1:8010 (Press CTRL+C to quit)
+INFO:     127.0.0.1:9928 - "GET /docs HTTP/1.1" 200 OK
+2026-11-11 15:13:14,348 INFO sqlalchemy.engine.Engine BEGIN (implicit)
+2026-11-11 15:13:14,351 INFO sqlalchemy.engine.Engine SELECT venta.id, venta.cliente_id, venta.fecha, venta.total, cliente_1.id AS id_1, cliente_1.nombre, cliente_1.email 
+FROM venta LEFT OUTER JOIN cliente AS cliente_1 ON cliente_1.id = venta.cliente_id 
+WHERE venta.id = $1::INTEGER
+2026-11-11 15:13:14,351 INFO sqlalchemy.engine.Engine [generated in 0.00023s] (11,)
+2026-11-11 15:13:14,360 INFO sqlalchemy.engine.Engine SELECT renglon_venta.venta_id, renglon_venta.id, renglon_venta.libro_id, renglon_venta.cantidad, renglon_venta.precio_unitario, libro_1.id, libro_1.isbn, libro_1.titulo, libro_1.precio, libro_1.stock, libro_1.editorial_id, libro_1.genero_id 
+FROM renglon_venta LEFT OUTER JOIN libro AS libro_1 ON libro_1.id = renglon_venta.libro_id 
+WHERE renglon_venta.venta_id IN ($1::INTEGER)
+2026-11-11 15:13:14,360 INFO sqlalchemy.engine.Engine [generated in 0.00029s] (11,)
+INFO:     127.0.0.1:25507 - "GET /ventas/11 HTTP/1.1" 200 OK
+2026-11-11 15:13:14,367 INFO sqlalchemy.engine.Engine ROLLBACK
+2026-11-11 15:13:14,902 INFO sqlalchemy.engine.Engine BEGIN (implicit)
+2026-11-11 15:13:14,902 INFO sqlalchemy.engine.Engine SELECT venta.id, venta.cliente_id, venta.fecha, venta.total, cliente_1.id AS id_1, cliente_1.nombre, cliente_1.email 
+FROM venta LEFT OUTER JOIN cliente AS cliente_1 ON cliente_1.id = venta.cliente_id 
+WHERE venta.id = $1::INTEGER
+2026-11-11 15:13:14,902 INFO sqlalchemy.engine.Engine [cached since 0.5511s ago] (12,)
+2026-11-11 15:13:14,903 INFO sqlalchemy.engine.Engine SELECT renglon_venta.venta_id, renglon_venta.id, renglon_venta.libro_id, renglon_venta.cantidad, renglon_venta.precio_unitario, libro_1.id, libro_1.isbn, libro_1.titulo, libro_1.precio, libro_1.stock, libro_1.editorial_id, libro_1.genero_id 
+FROM renglon_venta LEFT OUTER JOIN libro AS libro_1 ON libro_1.id = renglon_venta.libro_id 
+WHERE renglon_venta.venta_id IN ($1::INTEGER)
+2026-11-11 15:13:14,903 INFO sqlalchemy.engine.Engine [cached since 0.5439s ago] (12,)
+INFO:     127.0.0.1:25508 - "GET /ventas/12 HTTP/1.1" 200 OK
+2026-11-11 15:13:14,905 INFO sqlalchemy.engine.Engine ROLLBACK
+
