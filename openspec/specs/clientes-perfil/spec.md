@@ -75,8 +75,8 @@ El sistema SHALL responder `GET /clientes/{id}` con 200 y un `ClienteRead` que c
 - **WHEN** se consulta `GET /clientes/99999999999` (o cualquier id `> 2147483647`)
 - **THEN** el sistema responde 422 por validación declarativa de `Path` sin ejecutar el handler, y el cuerpo no contiene `DataError`, `Traceback`, `asyncpg`, SQL ni nombres de tablas/restricciones (RN-12)
 
-### Requirement: Ventas resumidas y paginadas de un cliente
-El sistema SHALL responder `GET /clientes/{id}/ventas` con 200 y una lista paginada de `VentaResumenRead`, que contiene `id`, `cliente_id`, `fecha: datetime` y `total: Decimal`, sin `renglones` ni detalles de libros y sin representar `total` como `float`. SHALL ordenar por `Venta.id` antes de aplicar `offset` y `limit`, aceptar `limit` de 1 a 100 (20 por defecto) y `offset` mayor o igual que cero y dentro del rango `int4` soportado, y responder 404 si el cliente no existe dentro de rango. Si el `cliente_id` de ruta o el `offset` están fuera de rango `int4` SHALL responder 422 sin ejecutar el handler.
+### Requirement: Ventas resumidas de un cliente sin renglones
+El sistema SHALL responder `GET /clientes/{id}/ventas` con 200 y una lista paginada de `VentaResumenRead`, que contiene `id`, `cliente_id`, `fecha` datetime y `total` Decimal, sin `renglones` ni detalles de libros y sin representar `total` como `float`.
 
 #### Scenario: Ventas del cliente sin renglones
 - **WHEN** se consulta el listado de ventas de un cliente existente con ventas y parámetros de paginación válidos
@@ -85,6 +85,9 @@ El sistema SHALL responder `GET /clientes/{id}/ventas` con 200 y una lista pagin
 #### Scenario: Cliente existente sin ventas
 - **WHEN** se consulta el listado de ventas de un cliente existente que no tiene ventas
 - **THEN** el sistema responde 200 con una lista vacía
+
+### Requirement: Paginación y validación de rango en ventas de un cliente
+El sistema SHALL ordenar el listado por `Venta.id` antes de aplicar `offset` y `limit`, aceptar `limit` de 1 a 100 (20 por defecto) y `offset >= 0` dentro de `int4`, y responder 404 si el cliente no existe dentro de rango o 422 si `cliente_id` u `offset` están fuera de rango `int4`, sin ejecutar el handler.
 
 #### Scenario: Paginación fuera de rango devuelve 422
 - **WHEN** se consulta el listado con `limit` menor que 1 o mayor que 100, o con `offset` negativo

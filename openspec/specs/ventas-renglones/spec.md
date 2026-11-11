@@ -1,17 +1,25 @@
-# Spec Delta
+# ventas-renglones Specification
 
 ## Purpose
 
 Definir el contrato observable para registrar ventas con renglones anidados y consultar ventas con detalle y paginación, donde el servidor copia precios del catálogo, calcula el total y la fecha, responde con la forma exacta del enunciado y ejecuta lecturas sin N+1 con un aviso diferido en segundo plano.
 
-## ADDED Requirements
+## Requirements
 
 ### Requirement: Alta de venta con renglones anidados y valores calculados por el servidor
-El sistema SHALL aceptar `POST /ventas/` con un cuerpo que contenga únicamente `cliente_id` y `renglones` (lista de objetos con `libro_id` y `cantidad`). El sistema SHALL rechazar con 422 cuerpos que incluyan `precio_unitario`, `total` o `fecha`, que no tengan al menos un renglón, que repitan el mismo `libro_id`, o que incumplan el contrato/rangos de tipo (RN-04, RN-05, RT-01). Para una venta válida, el sistema SHALL leer los libros referenciados en una única consulta por ids, copiar `precio_unitario` desde cada `Libro`, calcular `subtotal = cantidad × precio_unitario` por renglón y `total = Σ(cantidad × precio_unitario)` con `Decimal` cuantizado a 2 decimales, asignar `fecha` en el servidor con zona horaria, y persistir la venta junto con sus renglones antes de responder (RN-06, RN-07, DD-05). La respuesta SHALL ser 201 con `VentaRead` en la forma `{ id, fecha, total, cliente:{id,nombre,email}, renglones:[{libro_id, titulo, cantidad, precio_unitario, subtotal}] }`, con `total`, `precio_unitario` y `subtotal` serializados como valores decimales de 2 decimales (ej. `"77000.00"`), obtenida mediante releída precargada tras el commit para evitar relaciones no cargadas.
+El sistema SHALL aceptar `POST /ventas/` con un cuerpo con solo `cliente_id` y `renglones` (lista de `{libro_id, cantidad}`) y SHALL rechazar con 422 los cuerpos con campos prohibidos, sin renglones, con `libro_id` repetido o fuera de contrato (RN-04, RN-05, RT-01). En una venta válida, SHALL copiar el precio del catálogo, calcular `subtotal` y `total` con `Decimal` de 2 decimales, asignar `fecha` en el servidor y persistir antes de responder 201 con `VentaRead` (RN-06, RN-07, DD-05).
 
 #### Scenario: Alta válida calcula precios, subtotales y total (C-06)
 - **WHEN** se envía `POST /ventas/` con `cliente_id: 2` y `renglones: [{libro_id: 1, cantidad: 2}, {libro_id: 4, cantidad: 1}]`, donde los libros existen con precios 25000.00 y 27000.00 respectivamente
 - **THEN** el sistema responde 201 con una venta cuyo `cliente` es `{id: 2, nombre, email}` correspondiente, `renglones` contiene libro 1 con `cantidad: 2`, `precio_unitario: "25000.00"`, `subtotal: "50000.00"` y libro 4 con `cantidad: 1`, `precio_unitario: "27000.00"`, `subtotal: "27000.00"`, `total: "77000.00"`, `fecha` asignada por el servidor y sin campos `precio_unitario`, `total` ni `fecha` aceptados desde el cuerpo de entrada
+
+#### Scenario: Lectura única de libros y cálculo con Decimal
+- **WHEN** se procesa un `POST /ventas/` válido con varios renglones
+- **THEN** el sistema lee los libros referenciados en una única consulta por ids, copia `precio_unitario` desde cada `Libro`, calcula `subtotal = cantidad × precio_unitario` y `total = Σ(cantidad × precio_unitario)` cuantizado a 2 decimales con `Decimal`, y persiste la venta junto con sus renglones antes de responder (RN-06, RN-07, DD-05)
+
+#### Scenario: Forma exacta de la respuesta 201
+- **WHEN** se completa un alta válida
+- **THEN** el sistema responde 201 con `VentaRead` en la forma `{ id, fecha, total, cliente:{id,nombre,email}, renglones:[{libro_id, titulo, cantidad, precio_unitario, subtotal}] }`, obtenida mediante releída precargada tras el commit, con `total`, `precio_unitario` y `subtotal` serializados como valores decimales de 2 decimales (ej. `"77000.00"`) y `fecha` con zona horaria asignada por el servidor
 
 #### Scenario: Cliente o libro inexistente devuelve 409 propio (C-05)
 - **WHEN** se envía `POST /ventas/` con un `cliente_id` inexistente o con algún `renglones[].libro_id` inexistente (detectado porque falta en el resultado de la lectura de libros)
@@ -26,7 +34,11 @@ El sistema SHALL aceptar `POST /ventas/` con un cuerpo que contenga únicamente 
 - **THEN** el sistema rechaza la operación antes de escribir con un error HTTP controlado (422 según la decisión de `design.md`), con mensaje propio y sin `DataError`, SQL, trazas ni nombres de tablas/constraints en la respuesta (RN-12)
 
 ### Requirement: Lectura de ventas con forma exacta, paginación estable y sin N+1
-El sistema SHALL exponer `GET /ventas/{id}` y `GET /ventas/` devolviendo `VentaRead` (o lista de `VentaRead`) con la forma `{ id, fecha, total, cliente:{id,nombre,email}, renglones:[{libro_id, titulo, cantidad, precio_unitario, subtotal}] }`. Las consultas SHALL precargar de forma anticipada el cliente, los renglones y el libro de cada renglón (`joinedload`/`selectinload`) para resolver `cliente` y `titulo` sin carga perezosa y con número fijo de consultas independiente de la cantidad de renglones (RT-04, C-07). `GET /ventas/` SHALL ordenar por `id` ascendente para paginación estable y aceptar `limit` entre 1 y 100 (default 20) y `offset >= 0` dentro de `INT4_MAX`; `GET /ventas/{id}` SHALL validar `id <= INT4_MAX` sin imponer `ge=1` (id 0 responde 404 si no existe). Los valores monetarios SHALL serializarse como decimales de 2 decimales.
+El sistema SHALL exponer `GET /ventas/{id}` y `GET /ventas/` devolviendo `VentaRead` o una lista de `VentaRead`, con `cliente`, `renglones` y el libro de cada renglón precargados (`joinedload`/`selectinload`) para evitar carga perezosa y N+1 (RT-04, C-07). `GET /ventas/` SHALL ordenar por `id` ascendente para paginación estable. Los valores monetarios SHALL serializarse como decimales de 2 decimales.
+
+#### Scenario: Forma exacta de la respuesta y parámetros de paginación
+- **WHEN** se consulta `GET /ventas/{id}` o `GET /ventas/?limit=20&offset=0`
+- **THEN** la respuesta tiene la forma `{ id, fecha, total, cliente:{id,nombre,email}, renglones:[{libro_id, titulo, cantidad, precio_unitario, subtotal}] }` con montos de 2 decimales, y el listado acepta `limit` entre 1 y 100 (default 20) y `offset >= 0` dentro de `INT4_MAX`, validando además que `GET /ventas/{id}` acepte `id <= INT4_MAX` sin imponer `ge=1`
 
 #### Scenario: Detalle de venta existente con relaciones precargadas
 - **WHEN** se consulta `GET /ventas/{id}` para una venta existente con uno o más renglones
@@ -45,7 +57,11 @@ El sistema SHALL exponer `GET /ventas/{id}` y `GET /ventas/` devolviendo `VentaR
 - **THEN** la cantidad total de consultas SQL emitidas para resolver cada detalle es la misma, y la salida se puede guardar como evidencia en `test/` o consola según la tarea de verificación
 
 ### Requirement: Límites de rango int4 y validaciones declarativas en ventas
-El sistema SHALL aplicar límites declarativos usando `INT4_MAX` de `app/core/constants.py`: `GET /ventas/{id}` con `Path(le=INT4_MAX)` (sin `ge=1`), `GET /ventas/` con `limit` 1–100 y `offset >= 0` y `<= INT4_MAX`, y `POST /ventas/` con `cliente_id` y `renglones[].libro_id` como `Field(ge=1, le=INT4_MAX)` y `cantidad` como `Field(ge=1, le=INT4_MAX)`. Cualquier valor fuera de rango o tipo inválido SHALL responder 422 por validación antes de ejecutar lógica de negocio/consultas de escritura, sin pre-checks y sin exponer `DataError`, `Traceback`, `asyncpg`, SQL ni nombres de tablas/constraints (RN-10, RN-12, RT-01).
+El sistema SHALL aplicar límites declarativos con `INT4_MAX` de `app/core/constants.py` en `GET /ventas/{id}`, `GET /ventas/` y `POST /ventas/`, de modo que cualquier valor fuera de rango o tipo inválido responda 422 por validación antes de ejecutar lógica de negocio o escrituras, sin pre-checks ni internals de la base (RN-10, RN-12, RT-01).
+
+#### Scenario: Límites declarativos por endpoint
+- **WHEN** se revisan las validaciones de `GET /ventas/{id}`, `GET /ventas/` y `POST /ventas/`
+- **THEN** `GET /ventas/{id}` usa `Path(le=INT4_MAX)` sin `ge=1`, `GET /ventas/` acepta `limit` 1–100 y `offset >= 0` con `<= INT4_MAX`, y `POST /ventas/` usa `Field(ge=1, le=INT4_MAX)` para `cliente_id`, `renglones[].libro_id` y `cantidad`
 
 #### Scenario: Id de detalle fuera de int4 devuelve 422 sin internals
 - **WHEN** se consulta `GET /ventas/99999999999`

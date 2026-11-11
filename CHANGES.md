@@ -241,7 +241,7 @@ Paso │ Agente A (Backend Core) │ Agente B (Backend Aux)        │ Agente C 
 ## FASE 2 — Datos iniciales y pruebas locales
 
 ### [CH-08] `seed-datos-iniciales`
-- **Estado**: `[ ]` pendiente
+- **Estado**: `[x]` completado
 - **Scope**: Script/comando de datos iniciales determinista y documentado (seed)
   - Dueño potencial: Agente B (Backend Aux) — una sesión (~4-6 h)
   - Casos cubiertos: deja reproducibles el caso C-06 y el caso D-03 (los datos que esos casos asumen)
