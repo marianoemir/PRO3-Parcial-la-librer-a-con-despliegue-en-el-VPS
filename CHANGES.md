@@ -294,7 +294,7 @@ Paso │ Agente A (Backend Core) │ Agente B (Backend Aux)        │ Agente C 
   - `knowledge-base/10_preguntas_abiertas.md` §(2) — PENDIENTE
 
 ### [CH-11] `despliegue-vps-datos`
-- **Estado**: `[ ]` pendiente
+- **Estado**: `[x]` completado (2026-11-11), hecho a mano en el VPS sin propose/apply; evidencia en evidencia/D-03, D-04 y D-07, y DEPLOY.md actualizado
 - **Scope**: Despliegue con datos iniciales + `DEPLOY.md` escrito mientras se despliega — change propio de infraestructura en producción (D-03, D-04) y documentación operativa (persistencia solo comprobable con seed cargado)
   - Dueño potencial: Agente C (Infra/DevOps) — una sesión (~4-6 h)
   - Casos cubiertos: D-03 (desde afuera: `GET /health/ready` 200, `GET /libros/` con datos iniciales 200, `POST /ventas/` del caso C-06 → 201), D-04 (`docker rm -f` + re-run con seed cargado: vuelve a `healthy` y los datos persisten; persistencia solo comprobable con seed cargado)
