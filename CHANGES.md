@@ -329,12 +329,12 @@ Paso │ Agente A (Backend Core) │ Agente B (Backend Aux)        │ Agente C 
   - `knowledge-base/01_vision_y_objetivos.md` §Alcance v1.0 y §Métricas de éxito
   - `knowledge-base/09_decisiones_y_supuestos.md` §SU-03 (entrega sin secretos)
 ### [CH-15] `seed-fiel-enunciado`
-- **Estado**: `[ ]` pendiente
-- **Scope**: Alinear el dataset determinista de `app/seed.py` a los ejemplos del enunciado (27 filas: cliente 2 Tomás Ríos `tomas@example.com`, libros 1–5, sin precargar libro 6 / ISBN `978-950-00-0006-6`, venta 1 conservada) y transformar la estrategia de carga en reiniciable mediante `TRUNCATE TABLE ... RESTART IDENTITY CASCADE` de las 9 tablas del proyecto en una única transacción. Actualización de specs delta (`datos-iniciales`, `casos-http-c`), `.http` dependientes, `README.md` (sección seed) y `DEPLOY.md`.
+- **Estado**: `[x]` completado (archivado 2026-11-12)
+- **Scope**: Alinear el dataset determinista de `app/seed.py` a los ejemplos del enunciado (27 filas: cliente 2 Tomás Ríos `tomas@example.com`, libros 1–5, sin precargar libro 6 / ISBN `978-950-00-0006-6`, venta 1 conservada) y transformar la estrategia de carga en reiniciable mediante `TRUNCATE TABLE ... RESTART IDENTITY CASCADE` de las 9 tablas del proyecto en una única transacción. Actualización de specs delta (`datos-iniciales`, `casos-http-c`), `.http` dependientes, `README.md` (sección seed) y `DEPLOY.md`. Mariano aprobó el 12/11/2026, por su cuenta, el plan del seed y la excepción O3+O1 de CH-11 (sin carpeta archivada, con la evidencia de DEPLOY.md y evidencia/D-03, D-04 y D-07).
 - **Dependencias**: CH-08, CH-09
 - **Governance**: MEDIO
 - **Leer antes**:
-  - `openspec/changes/ch-15-seed-fiel-enunciado/proposal.md`, `design.md`, `tasks.md`, y deltas en `specs/`
+  - `openspec/changes/archive/2026-11-12-ch-15-seed-fiel-enunciado/proposal.md`, `design.md`, `tasks.md`, y deltas en `specs/`
   - `docs/Parcial_Cap1a4_Consigna.pdf` y `knowledge-base/`
 
 ---

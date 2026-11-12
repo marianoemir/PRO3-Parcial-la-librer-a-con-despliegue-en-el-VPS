@@ -38,35 +38,37 @@
 
 ## 5. Pasos manuales posteriores en VPS (fuera de este change)
 
-- [ ] 5.1 [VPS] **Responsable: Mariano.** Actualizar código en el servidor:
+> **Nota de ejecución (12/11/2026):** Tareas 5.1 a 5.8 realizadas por Mariano en el VPS entre las 17:29 y 17:30 (hora de Argentina). Evidencia registrada en `evidencia/D-03-url-publica.txt`, `evidencia/D-04-persistencia.txt` y `evidencia/D-07-aviso-comprobante.txt`, con `DEPLOY.md` actualizado y mergeado en main.
+
+- [x] 5.1 [VPS] **Responsable: Mariano.** Actualizar código en el servidor:
   ```bash
   cd /root/libreria
   git pull
   ```
-- [ ] 5.2 [VPS] **Responsable: Mariano.** Reconstruir la imagen Docker local para incorporar la versión actualizada de `app/seed.py`:
+- [x] 5.2 [VPS] **Responsable: Mariano.** Reconstruir la imagen Docker local para incorporar la versión actualizada de `app/seed.py`:
   ```bash
   docker build -t libreria .
   ```
-- [ ] 5.3 [VPS] **Responsable: Mariano.** Recrear el contenedor de la aplicación con la misma configuración vigente (sin credenciales expuestas):
+- [x] 5.3 [VPS] **Responsable: Mariano.** Recrear el contenedor de la aplicación con la misma configuración vigente (sin credenciales expuestas):
   ```bash
   docker rm -f libreria
   docker run -d --name libreria --network easypanel-grupo10 -p 8000:8000 \
     --restart unless-stopped --env-file /root/libreria.env libreria
   ```
-- [ ] 5.4 [VPS] **Responsable: Mariano.** Esperar a que el contenedor pase al estado `healthy`:
+- [x] 5.4 [VPS] **Responsable: Mariano.** Esperar a que el contenedor pase al estado `healthy`:
   ```bash
   docker ps
   curl -s http://127.0.0.1:8000/health/ready
   ```
-- [ ] 5.5 [VPS] **Responsable: Mariano.** Ejecutar la carga del seed de CH-15 dentro del contenedor (ADVERTENCIA: reinicia los datos de las 9 tablas del proyecto):
+- [x] 5.5 [VPS] **Responsable: Mariano.** Ejecutar la carga del seed de CH-15 dentro del contenedor (ADVERTENCIA: reinicia los datos de las 9 tablas del proyecto):
   ```bash
   docker exec libreria python -m app.seed
   ```
-- [ ] 5.6 [VPS] **Responsable: Mariano.** Rehacer D-03 y D-07 con el MISMO `POST /ventas/` del ejemplo del enunciado (capturar los logs de Docker antes de eliminar el contenedor):
+- [x] 5.6 [VPS] **Responsable: Mariano.** Rehacer D-03 y D-07 con el MISMO `POST /ventas/` del ejemplo del enunciado (capturar los logs de Docker antes de eliminar el contenedor):
   1) `GET /health/ready` responde 200 `{"estado":"listo"}` y `GET /libros/` responde 200 con los 5 libros del dataset.
   2) Ejecutar `POST /ventas/` con cliente 2 y libros 1×2 y 4×1, verificando 201 con `id: 2`, `total: "77000.00"`, cliente `tomas@example.com` y subtotales calculados. Guardar salida en `evidencia/D-03-url-publica.txt`.
   3) Inmediatamente tras la respuesta HTTP, capturar `docker logs libreria` para registrar el aviso de emisión de comprobante en diferido y guardar salida en `evidencia/D-07-aviso-comprobante.txt`.
-- [ ] 5.7 [VPS] **Responsable: Mariano.** Rehacer D-04 (persistencia/recuperación):
+- [x] 5.7 [VPS] **Responsable: Mariano.** Rehacer D-04 (persistencia/recuperación):
   1) Eliminar el contenedor y volver a levantarlo con el mismo comando:
      ```bash
      docker rm -f libreria
@@ -75,7 +77,7 @@
      ```
   2) Esperar a que vuelva al estado `healthy`.
   3) Consultar `GET /health/ready`, `GET /libros/` y `GET /ventas/2` verificando que los datos siguen persistiendo intactos en la base PostgreSQL. Guardar también `docker logs libreria` del contenedor nuevo, mostrando las líneas de los `GET /libros/` y `GET /ventas/2`, dentro de `evidencia/D-04-persistencia.txt`.
-- [ ] 5.8 [VPS] **Responsable: Mariano.** Actualizar la sección "Día y hora del despliegue" en `DEPLOY.md` con la fecha y hora exacta del despliegue vigente DESPUÉS del último `docker run`.
+- [x] 5.8 [VPS] **Responsable: Mariano.** Actualizar la sección "Día y hora del despliegue" en `DEPLOY.md` con la fecha y hora exacta del despliegue vigente DESPUÉS del último `docker run`.
 
 ## Workflow follow-up
 
