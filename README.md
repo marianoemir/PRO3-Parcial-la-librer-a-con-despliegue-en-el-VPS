@@ -140,7 +140,7 @@ migraciones.
 
 Los casos verificables tras el seed están en
 `test/ch08-seed-datos-iniciales.http`: `GET /health/ready`, `GET /libros/`
-(6 libros, incluido el libro 6 con autores 3 y 4), `GET /clientes/2`,
-`GET /ventas/1` (total `"77000.00"` con sus dos renglones) y `POST /ventas/`
-del caso C-06 (201 con precios copiados, subtotales 50000.00/27000.00 y total
-`"77000.00"`).
+(5 libros; el libro 6 del ejemplo del enunciado se crea con `POST /libros/`),
+`GET /clientes/2` (Tomás Ríos), `GET /ventas/1` (total `"77000.00"` con sus dos
+renglones) y `POST /ventas/` del caso C-06 (201 con `id: 2`, precios copiados,
+subtotales 50000.00/27000.00 y total `"77000.00"`).
