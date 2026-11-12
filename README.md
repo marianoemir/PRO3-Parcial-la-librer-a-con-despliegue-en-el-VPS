@@ -78,7 +78,7 @@ A continuación se detalla la correspondencia entre los casos de prueba de la co
 | C-07-prep | `test/ch09-c07-consultas-fijas.http` | `### C-07-prep — crear libro con varias autorías (ejemplo del enunciado)` |
 | C-07a | `test/ch09-c07-consultas-fijas.http` | `### C-07a — libro 1 del seed (una autoría)` |
 | C-07b | `test/ch09-c07-consultas-fijas.http` | `### C-07b — libro con varias autorías creado en C-07-prep` |
-| C-07c | `test/ch09-c07-consultas-fijas.http` | `### C-07c — detalle venta con dos renglones (creada en ch08 o venta 1 del seed)` |
+| C-07c | `test/ch09-c07-consultas-fijas.http` | `### C-07c — detalle venta con dos renglones (venta 1 del seed)` |
 | C-07d | `test/ch09-c07-consultas-fijas.http` | `### C-07d — venta auxiliar válida (un renglón)` |
 | C-07e | `test/ch09-c07-consultas-fijas.http` | `### C-07e — detalle venta auxiliar con un renglón` |
 | C-08 | `test/ch09-casos-http-c.http` | `### C-08 — intento de inyección en filtro de título` |

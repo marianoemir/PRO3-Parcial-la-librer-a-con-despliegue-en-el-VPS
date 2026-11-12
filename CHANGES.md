@@ -3,7 +3,7 @@
 > Índice canónico de todos los changes del proyecto **Parcial Programación III — La Librería con Despliegue en el VPS**.
 > Cada change es atómico: un agente puede implementarlo en una sesión (~4-6 horas).
 > **Leer este archivo antes de ejecutar cualquier `/opsx:propose`.**
-> **Convención de códigos**: `CH-01`–`CH-12` y `CH-15` = changes propios de este roadmap; `CH-13`–`CH-14` = rectificaciones del roadmap (aplicadas/documentadas); `C-01`–`C-08` = casos de prueba de la cátedra (no confundir). Los casos `D-01`–`D-07` son los de despliegue en VPS.
+> **Convención de códigos**: `CH-01`–`CH-12`, `CH-15`, `CH-16` y `CH-17` = changes propios de este roadmap; `CH-13`–`CH-14` = rectificaciones del roadmap (aplicadas/documentadas); `C-01`–`C-08` = casos de prueba de la cátedra (no confundir). Los casos `D-01`–`D-07` son los de despliegue en VPS.
 
 ---
 
@@ -44,6 +44,7 @@ CH-01 foundation-setup
   │                          │      └── CH-15 seed-fiel-enunciado (CH-08 ✓ + CH-09 ✓)
   │                          │            └── CH-12 evidencia-entrega (CH-09 ✓ + CH-11 ✓ + CH-15)
   │                          │                  └── CH-16 mapa-casos-y-evidencia-c07 (CH-12 tanda a ✓ + CH-15 ✓ + CH-09 ✓)
+  │                          │                        └── CH-17 cierre-docs (CH-16 ✓ + CH-12 tanda a ✓)
   │                          ├── CH-11 despliegue-vps-datos (CH-10 ✓ + CH-08 ✓; DEPLOY.md se escribe acá)
   │                          │      └── CH-12 evidencia-entrega (ver arriba)
   │
@@ -351,6 +352,19 @@ Paso │ Agente A (Backend Core) │ Agente B (Backend Aux)        │ Agente C 
 - **Leer antes**:
   - `openspec/changes/ch-16-mapa-casos-y-evidencia-c07/proposal.md`, `design.md`, `tasks.md`
   - `docs/Parcial_Cap1a4_Consigna.pdf` (C-07) y `knowledge-base/06_funcionalidades.md`
+
+### [CH-17] `cierre-docs`
+- **Estado**: `[x]` archivado (2026-11-12)
+- **Scope**: Cierre de detalles documentales y de gobernanza previo a la entrega:
+  - Eliminación de la nota inicial de la línea 5 y de todas las marcas provisionales `[A COMPLETAR]` en `DEPLOY.md` (despliegue vigente y servidor propio compartido para la calculadora de Frontend). Verificación de ausencia de marcas en `README.md`.
+  - Unificación exacta del rótulo C-07c a `### C-07c — detalle venta con dos renglones (venta 1 del seed)` en `test/ch09-c07-consultas-fijas.http` y en la tabla «Casos de prueba» de `README.md`.
+  - Actualización sincronizada de `AGENTS.md` y `CLAUDE.md` manteniendo identidad SHA256 idéntica, registrando CH-16 archivado y CH-12 como único change abierto (tanda a mergeada; tanda b pendiente).
+  - Registro de `[CH-17]` en `CHANGES.md` y actualización de `.active-orchestrator-state.json` (revisión 5 → 6) preservando CRLF.
+- **Dependencias**: CH-16, CH-12 tanda a
+- **Governance**: BAJO
+- **Leer antes**:
+  - `openspec/changes/ch-17-cierre-docs/proposal.md`, `design.md`, `tasks.md`
+  - `DEPLOY.md`, `README.md`, `AGENTS.md`, `CLAUDE.md`
 
 ---
 
