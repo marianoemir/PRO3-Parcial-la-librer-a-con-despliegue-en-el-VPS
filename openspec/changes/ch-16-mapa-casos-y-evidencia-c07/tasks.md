@@ -4,7 +4,7 @@
 
 ## 1. Encabezado histórico en test/ch07-ventas-exito.http
 
-- [ ] 1.1 Agregar el bloque de comentarios de advertencia histórica al inicio de `test/ch07-ventas-exito.http` (indicando que es un archivo histórico de desarrollo de CH-07 que requiere una base con IDs específicos y no corre contra el seed final, y referenciando a `test/ch08-seed-datos-iniciales.http` para C-06 y `test/ch09-c07-consultas-fijas.http` para C-07) sin alterar peticiones existentes, y verificar con:
+- [x] 1.1 Agregar el bloque de comentarios de advertencia histórica al inicio de `test/ch07-ventas-exito.http` (indicando que es un archivo histórico de desarrollo de CH-07 que requiere una base con IDs específicos y no corre contra el seed final, y referenciando a `test/ch08-seed-datos-iniciales.http` para C-06 y `test/ch09-c07-consultas-fijas.http` para C-07) sin alterar peticiones existentes, y verificar con:
   ```powershell
   [Console]::OutputEncoding = [System.Text.Encoding]::UTF8
   Get-Content -Encoding UTF8 test\ch07-ventas-exito.http -Head 15
@@ -13,8 +13,8 @@
 
 ## 2. Mapa de casos de prueba en README.md
 
-- [ ] 2.1 Agregar en `README.md`, justo debajo de la URL pública, esta línea: «Abrir con `http://` (no `https://`): la API sirve HTTP plano en el puerto 8000. Si el navegador redirige a https, probar con `http://179.199.129.73:8000/docs`.». Agregar además la sección «Casos de prueba» en `README.md` con la tabla Caso (C-01, C-02a, C-02b, C-03, C-04a, C-04b, C-05 [los dos requests de ch07-ventas-errores.http], C-06, C-07 [C-07-prep y C-07a a C-07e] y C-08) -> Archivo -> Rótulo del request, con los rótulos copiados textualmente de los .http (no de memoria). El orden y la nota del seed se copian de las notas operativas de `test/ch09-casos-http-c.http` y `test/ch09-c07-consultas-fijas.http`. Remitir los casos D hacia `evidencia/LEEME.md`.
-- [ ] 2.2 Verificar que cada rótulo de request referenciado exista textualmente en su archivo correspondiente y que `README.md` contenga cada nombre de archivo y cada rótulo de la tabla:
+- [x] 2.1 Agregar en `README.md`, justo debajo de la URL pública, esta línea: «Abrir con `http://` (no `https://`): la API sirve HTTP plano en el puerto 8000. Si el navegador redirige a https, probar con `http://179.199.129.73:8000/docs`.». Agregar además la sección «Casos de prueba» en `README.md` con la tabla Caso (C-01, C-02a, C-02b, C-03, C-04a, C-04b, C-05 [los dos requests de ch07-ventas-errores.http], C-06, C-07 [C-07-prep y C-07a a C-07e] y C-08) -> Archivo -> Rótulo del request, con los rótulos copiados textualmente de los .http (no de memoria). El orden y la nota del seed se copian de las notas operativas de `test/ch09-casos-http-c.http` y `test/ch09-c07-consultas-fijas.http`. Remitir los casos D hacia `evidencia/LEEME.md`.
+- [x] 2.2 Verificar que cada rótulo de request referenciado exista textualmente en su archivo correspondiente y que `README.md` contenga cada nombre de archivo y cada rótulo de la tabla:
   ```powershell
   [Console]::OutputEncoding = [System.Text.Encoding]::UTF8
   $mapa = @(
@@ -56,7 +56,7 @@
 
 ## 3. Captura y registro de evidencia de C-07 (venta de 1 renglón)
 
-- [ ] 3.1 **(Ejecuta Mariano en su terminal — el agente no la ejecuta ni la tilda)**:
+- [x] 3.1 **(Ejecuta Mariano en su terminal — el agente no la ejecuta ni la tilda)**:
   0) Mariano crea la base vacía `libreria_c16` en pgAdmin y edita el `.env` a mano para apuntar a ella (el agente no lo lee ni lo edita).
   1) Activar el venv y `$env:SQL_ECHO="true"`.
   2) Iniciar uvicorn con la salida a un archivo en `%TEMP%` (esto crea el esquema).
@@ -65,7 +65,7 @@
   5) GET /ventas/1 (2 renglones) y GET /ventas/2 (1 renglón).
   6) Detener uvicorn, copiar el log a `evidencia/C-07-ventas-un-renglon.log` y generar `evidencia/C-07-ventas-un-renglon-conteo.txt` contando las líneas `Engine SELECT ` entre el pedido anterior y cada pedido (mismo formato que `evidencia/C-07-conteo.txt`).
   7) Devolver el `.env` a `libreria_dev` y quitar `SQL_ECHO`. Si el POST no da id 2, repetir todo desde el paso 2. Sin scripts que alineen secuencias.
-- [ ] 3.2 Verificar la existencia y consistencia de los nuevos archivos de evidencia de C-07:
+- [x] 3.2 Verificar la existencia y consistencia de los nuevos archivos de evidencia de C-07:
   ```powershell
   [Console]::OutputEncoding = [System.Text.Encoding]::UTF8
   $pathLog = Test-Path evidencia\C-07-ventas-un-renglon.log
@@ -89,8 +89,8 @@
 
 ## 4. Actualización de evidencia/LEEME.md
 
-- [ ] 4.1 Incorporar en `evidencia/LEEME.md` la referencia a `C-07-ventas-un-renglon.log` y `C-07-ventas-un-renglon-conteo.txt` en el bloque de evidencia vigente, explicando que contiene la comparación de una venta de 1 renglón frente a una de 2 renglones.
-- [ ] 4.2 Verificar que `evidencia/LEEME.md` contenga las nuevas referencias con:
+- [x] 4.1 Incorporar en `evidencia/LEEME.md` la referencia a `C-07-ventas-un-renglon.log` y `C-07-ventas-un-renglon-conteo.txt` en el bloque de evidencia vigente, explicando que contiene la comparación de una venta de 1 renglón frente a una de 2 renglones.
+- [x] 4.2 Verificar que `evidencia/LEEME.md` contenga las nuevas referencias con:
   ```powershell
   [Console]::OutputEncoding = [System.Text.Encoding]::UTF8
   Get-Content -Encoding UTF8 evidencia\LEEME.md | Select-String -Pattern "C-07-ventas-un-renglon" -Encoding UTF8
@@ -99,7 +99,7 @@
 
 ## 5. Actualización de CHANGES.md y Estado de Orquestación
 
-- [ ] 5.1 Agregar la entrada `[CH-16]` en `CHANGES.md` declarando dependencias: CH-12 tanda a (rama encadenada, README y LEEME editados ahí), CH-15 (seed) y CH-09 (casos C-07), y actualizar el árbol de dependencias, conservando finales de línea CRLF, y verificar con:
+- [x] 5.1 Agregar la entrada `[CH-16]` en `CHANGES.md` declarando dependencias: CH-12 tanda a (rama encadenada, README y LEEME editados ahí), CH-15 (seed) y CH-09 (casos C-07), y actualizar el árbol de dependencias, conservando finales de línea CRLF, y verificar con:
   ```powershell
   git diff -U1 CHANGES.md
   & .\.venv\Scripts\python.exe -c "
@@ -111,7 +111,7 @@
   "
   ```
   Esperado: diff acotado a CH-16 y `Lineas sin CRLF: 0`.
-- [ ] 5.2 Leer primero el valor actual de `roadmap.revision` (esperado 4; si no, actual + 1) y agregar CH-16 en `roadmap.changes` copiando la forma exacta de la entrada de CH-15 (no como string suelto). Conservar los finales de línea del archivo (.active-orchestrator-state.json), verificando con:
+- [x] 5.2 Leer primero el valor actual de `roadmap.revision` (esperado 4; si no, actual + 1) y agregar CH-16 en `roadmap.changes` copiando la forma exacta de la entrada de CH-15 (no como string suelto). Conservar los finales de línea del archivo (.active-orchestrator-state.json), verificando con:
   ```powershell
   [Console]::OutputEncoding = [System.Text.Encoding]::UTF8
   Get-Content -Encoding UTF8 .active-orchestrator-state.json | Select-String "CH-16", "revision"

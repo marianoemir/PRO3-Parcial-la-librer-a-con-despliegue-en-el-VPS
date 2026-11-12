@@ -1,0 +1,3 @@
+POST   /ventas/       SELECT=3
+GET    /ventas/1      SELECT=2
+GET    /ventas/2      SELECT=2

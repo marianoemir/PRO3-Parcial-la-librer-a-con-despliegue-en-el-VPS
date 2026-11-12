@@ -1,4 +1,15 @@
 @base = http://127.0.0.1:8010
+
+# ADVERTENCIA HISTÓRICA:
+# Este archivo contiene peticiones históricas desarrolladas durante la etapa inicial
+# del módulo de ventas (CH-07). Fue concebido para una base auxiliar local con IDs
+# específicos (cliente_id=11, libro_a_id=45, libro_b_id=46) y NO DEBE EJECUTARSE
+# contra el seed final determinista de 27 filas (CH-15).
+#
+# Para ejecutar los casos vigentes y reproducibles contra el seed oficial:
+# - Caso C-06 (alta de venta determinista): ver test/ch08-seed-datos-iniciales.http
+# - Caso C-07 (consultas fijas sin N+1): ver test/ch09-c07-consultas-fijas.http
+#
 # Datos creados vía API para evidencia (no se asumen IDs existentes):
 # editorial_id=8 (Editorial CH07, PY), genero_id=5 (Genero CH07), autor_id=5 (existente, "Autor Prueba 5")
 # cliente_id=11 (Cliente CH07, cliente.ch07@example.com)

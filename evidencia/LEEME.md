@@ -16,6 +16,7 @@ Corresponde al estado final del proyecto con el dataset determinista de 27 filas
   POST   /ventas/       SELECT=3
   GET    /ventas/2      SELECT=2
   ```
+- **`C-07-ventas-un-renglon.log`** y **`C-07-ventas-un-renglon-conteo.txt`**: Comparación de C-07 entre una venta de 2 renglones (GET /ventas/1, del seed) y una de 1 renglón (GET /ventas/2, C-07d): mismo número de consultas.
 - **`D-03-url-publica.txt`**: Carga de datos iniciales con `python -m app.seed` ejecutado en el contenedor y pruebas de los endpoints (`GET /health/ready`, `GET /libros/` y `POST /ventas/`) desde afuera del VPS en la URL pública `http://libreria.marianochirino.me:8000`.
 - **`D-04-persistencia.txt`**: Demostración de persistencia tras eliminación forzada (`docker rm -f libreria`) y recreación con el mismo `docker run`; el contenedor vuelve a estado `healthy` y los datos en PostgreSQL se conservan intactos.
 - **`D-07-aviso-comprobante.txt`**: Registro en `docker logs` del aviso de comprobante emitido en segundo plano (`BackgroundTasks`) tras registrar una venta con `POST /ventas/`, apareciendo después de la línea de respuesta HTTP.

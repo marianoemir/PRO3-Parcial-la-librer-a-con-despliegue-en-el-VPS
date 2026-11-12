@@ -43,6 +43,7 @@ CH-01 foundation-setup
   │                          ├── CH-09 casos-http-C
   │                          │      └── CH-15 seed-fiel-enunciado (CH-08 ✓ + CH-09 ✓)
   │                          │            └── CH-12 evidencia-entrega (CH-09 ✓ + CH-11 ✓ + CH-15)
+  │                          │                  └── CH-16 mapa-casos-y-evidencia-c07 (CH-12 tanda a ✓ + CH-15 ✓ + CH-09 ✓)
   │                          ├── CH-11 despliegue-vps-datos (CH-10 ✓ + CH-08 ✓; DEPLOY.md se escribe acá)
   │                          │      └── CH-12 evidencia-entrega (ver arriba)
   │
@@ -337,6 +338,19 @@ Paso │ Agente A (Backend Core) │ Agente B (Backend Aux)        │ Agente C 
 - **Leer antes**:
   - `openspec/changes/archive/2026-11-12-ch-15-seed-fiel-enunciado/proposal.md`, `design.md`, `tasks.md`, y deltas en `specs/`
   - `docs/Parcial_Cap1a4_Consigna.pdf` y `knowledge-base/`
+
+### [CH-16] `mapa-casos-y-evidencia-c07`
+- **Estado**: `[ ]` en progreso
+- **Scope**: Ajustes de trazabilidad y evidencia docente previa al cierre:
+  - Encabezado histórico de advertencia en `test/ch07-ventas-exito.http` (no altera peticiones).
+  - Aviso de acceso HTTP plano en `README.md` y mapa exhaustivo de casos de prueba C-01 a C-08 con rótulos exactos y precondiciones de seed.
+  - Generación y registro de evidencia complementaria de C-07 (`evidencia/C-07-ventas-un-renglon.log` y `C-07-ventas-un-renglon-conteo.txt`) comparando venta de 1 renglón vs 2 renglones en base limpia `libreria_c16`.
+  - Actualización documental de `evidencia/LEEME.md`.
+- **Dependencias**: CH-12 tanda a (rama encadenada, README y LEEME editados ahí), CH-15 (seed) y CH-09 (casos C-07)
+- **Governance**: BAJO
+- **Leer antes**:
+  - `openspec/changes/ch-16-mapa-casos-y-evidencia-c07/proposal.md`, `design.md`, `tasks.md`
+  - `docs/Parcial_Cap1a4_Consigna.pdf` (C-07) y `knowledge-base/06_funcionalidades.md`
 
 ---
 
