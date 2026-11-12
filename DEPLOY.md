@@ -1,5 +1,7 @@
 # DEPLOY.md — Cómo se construyó y se corrió la imagen en el VPS
 
+**URL pública:** http://libreria.marianochirino.me:8000 (documentación en `/docs`, estado en `/health/ready`; HTTP plano, no https).
+
 > Lo marcado **[A COMPLETAR]** se confirma al cerrar el despliegue final.
 
 ## URL pública
