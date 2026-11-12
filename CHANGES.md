@@ -354,7 +354,7 @@ Paso │ Agente A (Backend Core) │ Agente B (Backend Aux)        │ Agente C 
   - `docs/Parcial_Cap1a4_Consigna.pdf` (C-07) y `knowledge-base/06_funcionalidades.md`
 
 ### [CH-17] `cierre-docs`
-- **Estado**: `[ ]` pendiente
+- **Estado**: `[x]` archivado (2026-11-12)
 - **Scope**: Cierre de detalles documentales y de gobernanza previo a la entrega:
   - Eliminación de la nota inicial de la línea 5 y de todas las marcas provisionales `[A COMPLETAR]` en `DEPLOY.md` (despliegue vigente y servidor propio compartido para la calculadora de Frontend). Verificación de ausencia de marcas en `README.md`.
   - Unificación exacta del rótulo C-07c a `### C-07c — detalle venta con dos renglones (venta 1 del seed)` en `test/ch09-c07-consultas-fijas.http` y en la tabla «Casos de prueba» de `README.md`.
