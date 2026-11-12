@@ -36,3 +36,14 @@ Detalle de cada duda:
 
 ## [DISCOVERY] scale — low confidence
 `scale` pudo inferirse como `public_multi_user` desde el despliegue en VPS accesible desde afuera, pero el uso real es de corrección por grupo. No bloquea la KB; se deja como valor a confirmar por el equipo.
+
+## Indicaciones del profesor (12/11/2026, de segunda mano)
+
+> Aclaración: Información relatada por Mariano, sin captura en el repositorio.
+
+- (a) Alcanza con declarar la URL de la API en el README o en DEPLOY.md (ejemplo de nombre que dio: `grupo10vps.com/api`; sirve la URL de /health o la de la documentación para ver que está desplegado).
+- (b) Se puede reutilizar la base de otra app ya desplegada (la calculadora) para no tener dos Postgres.
+- (c) Lo más importante son los casos de prueba mínimos (C-01 a C-08 y D-01 a D-07): tienen que andar sí o sí.
+- (d) Después de las consignas se evalúan los endpoints de referencia con los ejemplos de JSON y los requisitos no funcionales.
+- (e) Sobre las deducciones de puerto y URL dijo, según Mariano: «les doy total libertad sobre esas deducciones en el parcial, pero para el TPI sí hay que hacer con proxy».
+- Respuesta del profesor a un compañero (12/11/2026, 17:23, relatada): el compañero le preguntó cuáles eran «los datos de acceso y la base» que menciona el PDF (ej. 8); el profesor contestó que no hacen falta los datos de acceso y que hay que usar el Postgres que usaron en la calculadora.
