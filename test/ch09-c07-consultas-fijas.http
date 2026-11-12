@@ -1,36 +1,64 @@
 @base = http://127.0.0.1:8000
 
-# CH-09 — C-07 portable: detalles con uno frente a varios autores/renglones.
+# CH-09 / CH-15 — C-07 portable: detalles con cantidad fija de consultas.
 #
-# Ejecutar solo después del ciclo limpio documentado en
-# `ch09-casos-http-c.http` y después de reutilizar C-06 desde
-# `test/ch08-seed-datos-iniciales.http`. Los ids 1, 2, 3 y 6 de abajo son
-# fixtures de ese ciclo, no contratos públicos de la API ni ids reutilizables
-# en una base ya usada.
+# Prerrequisito: Ejecutar sobre base local dedicada (libreria_c15), con esquema creado y `python -m app.seed`
+# (27 filas, reinicio en cada ejecución).
 #
-# Para observar C-07, reiniciar localmente la API con el diagnóstico SQL
-# habilitado y comparar en consola las consultas de cada par: libro 1 vs 6 y
-# venta 2 vs 3. No guardar la salida SQL aquí ni en `evidencia/`: CH-12 es el
-# dueño de la evidencia final. La comparación requerida es igualdad/fijeza de
-# cada par, no un número nuevo de SELECTs.
+# NOTA OPERATIVA: Antes de ejecutar este archivo (C-07), correr `python -m app.seed` (es repetible),
+# ya que los inserts fallidos de pruebas anteriores (C-02, C-04, C-05) consumen valores de secuencia.
+#
+# El libro con varias autorías se crea en este archivo POR ÚNICA VEZ con el POST /libros/ del
+# ejemplo del enunciado (ISBN 978-950-00-0006-6). Tras el seed de 5 libros, el id devuelto es
+# deterministamente 6, pero se captura dinámicamente mediante `{{crearLibro.response.body.$.id}}`
+# para el GET de detalle (sintaxis REST Client de VS Code).
+#
+# Para la comparación de ventas, se utiliza la venta 2 creada previamente (o venta 1 del seed) y la venta
+# auxiliar creada como `# @name crearVentaAuxiliar`, cuyo detalle se consulta vía
+# `{{crearVentaAuxiliar.response.body.$.id}}`.
+#
+# Para observar C-07, reiniciar localmente la API con diagnóstico SQL habilitado
+# (SQL_ECHO=true) y comparar en consola las consultas de cada par:
+# - libro 1 (1 autoría, del seed) vs libro creado por el ejemplo (2 autorías) -> 3 SELECT fijos.
+# - venta con dos renglones vs venta auxiliar con un renglón -> 2 SELECT fijos.
+# La comparación requerida es igualdad/fijeza en cada par.
 
-### C-07a — fixture seed: libro 1 tiene una autoría
-# Esperado: 200; editorial y género serializados; `autores` contiene solo
-# autor_id 1, rol "autor", orden 1. Comparar su cantidad de consultas con libro 6.
+### C-07-prep — crear libro con varias autorías (ejemplo del enunciado)
+# @name crearLibro
+# Esperado: 201. Con el estado recién sembrado (5 libros), este alta obtiene id 6.
+POST {{base}}/libros/
+Content-Type: application/json
+
+{
+  "isbn": "978-950-00-0006-6",
+  "titulo": "Los que aman, odian",
+  "precio": "21000.00",
+  "stock": 4,
+  "editorial_id": 1,
+  "genero_id": 1,
+  "autores": [
+    {"autor_id": 3, "rol": "coautor", "orden": 1},
+    {"autor_id": 4, "rol": "coautor", "orden": 2}
+  ]
+}
+
+### C-07a — libro 1 del seed (una autoría)
+# Esperado: 200; autores con autor_id 1 (autor, orden 1). Comparar consultas con C-07b (3 SELECT fijos).
 GET {{base}}/libros/1
 
-### C-07b — fixture seed: libro 6 tiene dos autorías
-# Esperado: 200; `autores` contiene autor_id 3 (coautor, orden 1) y autor_id 4
-# (coautor, orden 2). La cantidad de consultas debe ser fija e igual a C-07a.
-GET {{base}}/libros/6
+### C-07b — libro con varias autorías creado en C-07-prep
+# Esperado: 200; autores con autor_id 3 (coautor, orden 1) y autor_id 4 (coautor, orden 2).
+# La cantidad de consultas debe ser fija e igual a C-07a (3 SELECT).
+GET {{base}}/libros/{{crearLibro.response.body.$.id}}
 
-### C-07c — fixture del ciclo: venta 2 creada por C-06, con dos renglones
-# Esperado: 200; cliente id 2; renglones libro 1 x2 y libro 4 x1; total
-# "77000.00". Comparar su cantidad de consultas con venta 3.
+### C-07c — detalle venta con dos renglones (creada en ch08 o venta 1 del seed)
+# Esperado: 200; cliente Tomás Ríos (tomas@example.com); renglones libro 1 x2 y libro 4 x1; total "77000.00".
+# Comparar consultas con C-07e (2 SELECT fijos).
 GET {{base}}/ventas/2
 
-### C-07d — fixture auxiliar válida: venta de un renglón, solo en base limpia
-# Esperado: 201; en este orden genera venta id 3. No enviar precio, total ni fecha.
+### C-07d — venta auxiliar válida (un renglón)
+# @name crearVentaAuxiliar
+# Esperado: 201; genera la siguiente venta con un único renglón.
 POST {{base}}/ventas/
 Content-Type: application/json
 
@@ -41,8 +69,8 @@ Content-Type: application/json
   ]
 }
 
-### C-07e — detalle de la fixture auxiliar de un renglón
-# Esperado: 200; cliente id 2; un renglón con libro_id 2, cantidad 1 y precio
-# unitario "18000.00"; total "18000.00". La cantidad de consultas debe ser fija
-# e igual a C-07c, aunque esta venta tenga menos renglones.
-GET {{base}}/ventas/3
+### C-07e — detalle venta auxiliar con un renglón
+# Esperado: 200; cliente Tomás Ríos (tomas@example.com); un renglón libro_id 2, cantidad 1, precio_unitario "18000.00",
+# total "18000.00". La cantidad de consultas debe ser fija e igual a C-07c (2 SELECT).
+GET {{base}}/ventas/{{crearVentaAuxiliar.response.body.$.id}}
+

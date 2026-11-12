@@ -43,13 +43,13 @@ docker run -d --name libreria --network easypanel-grupo10 -p 8000:8000 \
 - `--env-file /root/libreria.env`: configuración desde el servidor, sin secretos en la imagen.
 
 ## Datos iniciales
-Con el contenedor arriba y las tablas creadas, se cargan una sola vez con el comando de datos iniciales del proyecto:
+Con el contenedor arriba y las tablas creadas, se cargan con el comando de datos iniciales del proyecto:
 
 ```bash
 docker exec libreria python -m app.seed
 ```
 
-Carga 30 filas (2 editoriales, 2 géneros, 5 autores, 6 libros, 7 autorías, 3 clientes, 2 perfiles, 1 venta y 2 renglones). La salida está en `evidencia/D-03-url-publica.txt`. El script vive en `app/seed.py`, que la imagen ya incluye: no hizo falta cambiar el `Dockerfile`.
+Carga el dataset documentado de 27 filas (2 editoriales, 2 géneros, 5 autores, 5 libros, 5 autorías, 3 clientes, 2 perfiles, 1 venta y 2 renglones). **ADVERTENCIA: Reejecutar el seed reinicia los datos**: vacía y recarga las 9 tablas del proyecto en una única transacción sin confirmación previa (con secuencias/ids coherentes), dejando siempre el mismo estado inicial conocido. La salida está en `evidencia/D-03-url-publica.txt`. El script vive en `app/seed.py`, que la imagen ya incluye: si se modifica `app/seed.py`, debe reconstruirse la imagen (`docker build -t libreria .`) antes de ejecutar el seed en el contenedor.
 
 ## Cambios hechos al proyecto para que corra en el contenedor
 - Ninguno: el build y el arranque funcionaron sin modificar el código (confirmado con D-02, D-05 y D-06). Lo que se agregó al proyecto fue solo el `Dockerfile` y el `.dockerignore`.

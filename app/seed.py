@@ -1,4 +1,4 @@
-"""Datos iniciales (seed) del catálogo y las ventas (CH-08).
+"""Datos iniciales (seed) del catálogo y las ventas (CH-15).
 
 Comando de línea de comandos, independiente de la API y fuera de
 ``app/modules/*``: no expone endpoints, no define router, schemas ni service
@@ -8,34 +8,33 @@ copia ``app/`` a la imagen, así que el módulo viaja con ella).
 
 Garantías:
 
-- **Determinista**: ids y valores fijos, tomados de ``design.md`` §2. Dinero
+- **Determinista**: ids y valores fijos, tomados de ``design.md``. Dinero
   siempre ``Decimal`` (nunca ``float``); la fecha de la venta lleva zona
-  horaria.
-- **Idempotente**: cada fila se inserta con ``INSERT ... ON CONFLICT DO
-  NOTHING`` (sin ``index_elements``), así PostgreSQL ignora el conflicto
-  contra la PK y contra todas las UNIQUE. Reejecutar no duplica y repone solo
-  las filas faltantes; la base sigue siendo la garante de unicidad (RT-02).
-- **Atómica**: toda la carga ocurre en una única transacción; ante cualquier
-  rechazo de la base se revierte completa y no quedan filas parciales.
+  horaria. Dataset fiel a los ejemplos del enunciado (27 filas en total).
+- **Reiniciable / Repetible**: vacía y recarga en una única transacción las 9
+  tablas del proyecto con ``TRUNCATE ... RESTART IDENTITY CASCADE``. Cada
+  ejecución restablece el mismo estado inicial reproducible, incluso si se
+  crearon filas posteriores vía API.
+- **Atómica**: vaciado, inserciones y alineación de secuencias ocurren en una
+  única transacción; ante cualquier rechazo de la base se revierte completa
+  (incluido el vaciado) y no quedan estados parciales.
 - **Secuencias alineadas**: al final de la transacción se ejecuta ``setval``
-  sobre las tablas con ``id`` serial para que un alta posterior por API
-  obtenga un id nuevo (editorial 3, venta 2) en lugar de chocar con el
-  dataset.
+  sobre las tablas con ``id`` serial para que las altas por API obtengan ids
+  coherentes (ej. siguiente libro disponible, venta 2).
 - **Sin efectos no definidos**: NO ejecuta ``create_all`` ni migraciones (el
   esquema es responsabilidad del lifespan de ``app/main.py``) y NO descuenta
   stock por la venta cargada (``knowledge-base/10_preguntas_abiertas.md``
   §(1) sigue pendiente).
-- **Sin secretos**: nunca imprime ``DATABASE_URL``, usuario, contraseña, SQL
-  ni trazas internas; cada fallo se traduce a un mensaje propio y a un código
-  de salida distinto de 0.
+- **Sin secretos ni internals**: nunca imprime ``DATABASE_URL``, usuario,
+  contraseña, SQL, nombres de constraints ni trazas internas; cada fallo se
+  traduce a un mensaje propio y a un código de salida distinto de 0.
 
 Uso::
 
     python -m app.seed
 
-El dataset es de ejemplo del implementador, no una regla de negocio: la
-lista cerrada de filas base es §(6) de ``10_preguntas_abiertas.md`` y sigue
-pendiente de la cátedra.
+ADVERTENCIA: reejecutar el seed reinicia y borra sin confirmación previa los
+datos de las 9 tablas del proyecto.
 """
 
 from __future__ import annotations
@@ -114,8 +113,8 @@ TABLAS: Final[dict[str, Table]] = {
 }
 
 # ---------------------------------------------------------------------------
-# Dataset determinista (design.md §2). Filas inmutables (dict dentro de
-# tupla) y con ids explícitos; el orden de las claves es el de dependencias.
+# Dataset determinista (27 filas, fiel a los ejemplos del enunciado).
+# Filas inmutables (dict dentro de tupla) y con ids explícitos.
 # ---------------------------------------------------------------------------
 
 _EDITORIALES: Final[tuple[dict[str, Any], ...]] = (
@@ -182,15 +181,6 @@ _LIBROS: Final[tuple[dict[str, Any], ...]] = (
         "editorial_id": 1,
         "genero_id": 1,
     },
-    {
-        "id": 6,
-        "isbn": "978-950-00-0006-6",
-        "titulo": "Los que aman, odian",
-        "precio": Decimal("21000.00"),
-        "stock": 4,
-        "editorial_id": 1,
-        "genero_id": 1,
-    },
 )
 
 _LIBRO_AUTOR: Final[tuple[dict[str, Any], ...]] = (
@@ -199,13 +189,11 @@ _LIBRO_AUTOR: Final[tuple[dict[str, Any], ...]] = (
     {"libro_id": 3, "autor_id": 3, "rol": "autor", "orden": 1},
     {"libro_id": 4, "autor_id": 2, "rol": "autor", "orden": 1},
     {"libro_id": 5, "autor_id": 5, "rol": "autor", "orden": 1},
-    {"libro_id": 6, "autor_id": 3, "rol": "coautor", "orden": 1},
-    {"libro_id": 6, "autor_id": 4, "rol": "coautor", "orden": 2},
 )
 
 _CLIENTES: Final[tuple[dict[str, Any], ...]] = (
     {"id": 1, "nombre": "Ana Gómez", "email": "ana.gomez@example.com"},
-    {"id": 2, "nombre": "Bruno Díaz", "email": "bruno.diaz@example.com"},
+    {"id": 2, "nombre": "Tomás Ríos", "email": "tomas@example.com"},
     {
         "id": 3,
         "nombre": "Carla Fernández",
@@ -254,7 +242,7 @@ _RENGLONES: Final[tuple[dict[str, Any], ...]] = (
     },
 )
 
-#: Dataset completo, inmutable y en orden de dependencias.
+#: Dataset completo, inmutable y en orden de dependencias (27 filas).
 DATASET: Final[Mapping[str, tuple[dict[str, Any], ...]]] = MappingProxyType(
     {
         "editorial": _EDITORIALES,
@@ -288,10 +276,6 @@ def validar_dataset(
 
     Se ejecuta antes de abrir cualquier conexión: si el dataset se edita de
     forma inconsistente, el comando aborta con código 1 sin tocar la base.
-    Verifica precios y cantidades positivas, stock no negativo, total
-    coherencia con los renglones, roles y órdenes aceptados por los CHECK de
-    ``libro_autor``, tipos ``Decimal``/``datetime`` con zona horaria y que
-    toda clave foránea apunte a un id presente en el propio dataset.
     """
     conjunto: Mapping[str, Sequence[Mapping[str, Any]]] = (
         DATASET if datos is None else datos
@@ -458,7 +442,7 @@ def validar_dataset(
 
 
 # ---------------------------------------------------------------------------
-# Carga transaccional
+# Carga transaccional reiniciable
 # ---------------------------------------------------------------------------
 
 
@@ -489,9 +473,9 @@ def _mensaje_error(exc: BaseException) -> str:
         )
     if isinstance(exc, IntegrityError) or (sqlstate or "").startswith("23"):
         return (
-            "La base contiene datos incompatibles con el dataset (claves "
-            "naturales o referencias en conflicto). Se revirtió toda la carga: "
-            "usá una base limpia."
+            "No se pudieron cargar los datos iniciales debido a un conflicto de "
+            "integridad. Se revirtió toda la carga (incluido el vaciado): la base "
+            "conserva su estado previo."
         )
     if (
         isinstance(exc, (OperationalError, InterfaceError, OSError))
@@ -512,39 +496,33 @@ def _mensaje_error(exc: BaseException) -> str:
 async def _cargar(
     session_factory,
     datos: Mapping[str, Sequence[Mapping[str, Any]]],
-) -> dict[str, tuple[int, int]]:
-    """Carga el dataset en una única transacción y alinea las secuencias.
+) -> dict[str, int]:
+    """Reinicia y carga el dataset en una única transacción de base de datos.
 
-    Devuelve, por tabla, ``(insertadas, ya_existían)``. Cualquier excepción
-    revierte la transacción completa (``session.begin()``) y se propaga para
-    que el CLI la traduzca a un mensaje propio.
+    Ejecuta TRUNCATE de las 9 tablas explícitas del proyecto con RESTART IDENTITY
+    CASCADE, luego inserta el dataset y alinea secuencias.
+    Cualquier excepción revierte la transacción completa (incluido el TRUNCATE).
     """
-    resumen: dict[str, tuple[int, int]] = {}
+    resumen: dict[str, int] = {}
     async with session_factory() as session:
         async with session.begin():
+            # 1) TRUNCATE transaccional de las 9 tablas nombradas explícitamente
+            tablas_sql = ", ".join(ORDEN_TABLAS)
+            await session.execute(
+                text(f"TRUNCATE TABLE {tablas_sql} RESTART IDENTITY CASCADE")
+            )
+
+            # 2) Inserción de todas las filas del dataset
             for nombre in ORDEN_TABLAS:
                 tabla = TABLAS[nombre]
-                insertadas = 0
-                for fila in datos[nombre]:
-                    # ON CONFLICT DO NOTHING sin target: cubre la PK y todas
-                    # las UNIQUE de la tabla (idempotencia total).
-                    stmt = (
-                        pg_insert(tabla)
-                        .values(**dict(fila))
-                        .on_conflict_do_nothing()
-                        .returning(*tabla.primary_key.columns)
-                    )
-                    resultado = await session.execute(stmt)
-                    insertadas += len(resultado.fetchall())
-                resumen[nombre] = (insertadas, len(datos[nombre]) - insertadas)
+                filas = datos[nombre]
+                for fila in filas:
+                    stmt = pg_insert(tabla).values(**dict(fila))
+                    await session.execute(stmt)
+                resumen[nombre] = len(filas)
 
-            # Insertar ids explícitos NO avanza la secuencia en PostgreSQL:
-            # se alinea al máximo cargado para que el próximo alta por API
-            # obtenga un id nuevo y no choque con la PK del dataset.
+            # 3) Alinear secuencias al máximo id cargado
             for nombre in TABLAS_CON_SECUENCIA:
-                # El nombre de tabla es un literal de la lista constante de
-                # este módulo (nunca entrada del usuario); el valor del setval
-                # sale del MAX(id) de la propia tabla.
                 await session.execute(
                     text(
                         "SELECT setval(pg_get_serial_sequence("
@@ -561,24 +539,23 @@ async def _cargar(
 
 
 def _imprimir_resumen(
-    resumen: dict[str, tuple[int, int]],
+    resumen: dict[str, int],
     datos: Mapping[str, Sequence[Mapping[str, Any]]],
 ) -> None:
-    """Imprime el resumen por tabla y los ids cargados, sin credenciales."""
-    total_insertadas = sum(insertadas for insertadas, _ in resumen.values())
-    total_existentes = sum(existentes for _, existentes in resumen.values())
+    """Imprime el resumen del estado inicial cargado/reiniciado."""
+    total_filas = sum(resumen.values())
 
     print("Datos iniciales (seed) — librería")
     print("")
-    print(f"{'Tabla':<16}{'Insertadas':>12}{'Ya existían':>14}")
-    print(f"{'-' * 16}{'-' * 12}{'-' * 14}")
+    print("Estado inicial cargado (base reiniciada a 27 filas):")
+    print(f"{'Tabla':<16}{'Filas cargadas':>16}")
+    print(f"{'-' * 16}{'-' * 16}")
     for nombre in ORDEN_TABLAS:
-        insertadas, existentes = resumen[nombre]
-        print(f"{nombre:<16}{insertadas:>12}{existentes:>14}")
-    print(f"{'-' * 16}{'-' * 12}{'-' * 14}")
-    print(f"{'Total':<16}{total_insertadas:>12}{total_existentes:>14}")
+        print(f"{nombre:<16}{resumen[nombre]:>16}")
+    print(f"{'-' * 16}{'-' * 16}")
+    print(f"{'Total':<16}{total_filas:>16}")
     print("")
-    print("Ids del dataset:")
+    print("Ids del dataset inicial:")
     for nombre in ORDEN_TABLAS:
         if nombre == "libro_autor":
             pares = ", ".join(
@@ -611,9 +588,7 @@ async def main(
             print(f"  - {error}")
         return 1
 
-    # 2) Configuración y motor. La importación de app.core.config valida
-    # DATABASE_URL al importarse (fail-fast de CH-01), por eso es perezosa:
-    # así una variable faltante se informa con mensaje propio y no con traza.
+    # 2) Configuración y motor.
     try:
         from app.core.config import get_database_url
 

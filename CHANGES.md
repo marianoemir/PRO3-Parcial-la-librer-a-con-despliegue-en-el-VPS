@@ -3,7 +3,7 @@
 > Índice canónico de todos los changes del proyecto **Parcial Programación III — La Librería con Despliegue en el VPS**.
 > Cada change es atómico: un agente puede implementarlo en una sesión (~4-6 horas).
 > **Leer este archivo antes de ejecutar cualquier `/opsx:propose`.**
-> **Convención de códigos**: `CH-01`–`CH-12` = changes propios de este roadmap; `CH-13`–`CH-14` = rectificaciones del roadmap (aplicadas/documentadas); `C-01`–`C-08` = casos de prueba de la cátedra (no confundir). Los casos `D-01`–`D-07` son los de despliegue en VPS.
+> **Convención de códigos**: `CH-01`–`CH-12` y `CH-15` = changes propios de este roadmap; `CH-13`–`CH-14` = rectificaciones del roadmap (aplicadas/documentadas); `C-01`–`C-08` = casos de prueba de la cátedra (no confundir). Los casos `D-01`–`D-07` son los de despliegue en VPS.
 
 ---
 
@@ -41,8 +41,10 @@ CH-01 foundation-setup
   │                    └── CH-08 seed-datos-iniciales
   │                          │
   │                          ├── CH-09 casos-http-C
+  │                          │      └── CH-15 seed-fiel-enunciado (CH-08 ✓ + CH-09 ✓)
+  │                          │            └── CH-12 evidencia-entrega (CH-09 ✓ + CH-11 ✓ + CH-15)
   │                          ├── CH-11 despliegue-vps-datos (CH-10 ✓ + CH-08 ✓; DEPLOY.md se escribe acá)
-  │                          │      └── CH-12 evidencia-entrega (CH-09 ✓ + CH-11 ✓)
+  │                          │      └── CH-12 evidencia-entrega (ver arriba)
   │
   └── CH-03 docker-imagen (solo necesita CH-01; arranca temprano, DD-06)
         └── CH-10 despliegue-vps-inicial (CH-02 ✓ + CH-03 ✓; detección temprana red/host.docker.internal)
@@ -319,13 +321,21 @@ Paso │ Agente A (Backend Core) │ Agente B (Backend Aux)        │ Agente C 
   - Casos cubiertos: evidencia del caso C-07 (captura o fragmento de consola con el conteo fijo de consultas) y de los casos D-01 a D-07, salida por salida, en `evidencia/`
   - `README.md` final: nombres y apellidos de los integrantes + pasos para levantar desde cero (entorno virtual, dependencias, `.env` desde `env.example`, arranque del servidor que crea las tablas, carga de datos iniciales con el seed de CH-08)
   - Verificación del único `.zip` `Parcial_Cap1a4_<NombreDelGrupo>.zip` (un solo integrante lo sube): código fuente, `requirements.txt`, `env.example` sin valores reales, `test/`, `Dockerfile`, `.dockerignore`, `README.md`, `DEPLOY.md`, `evidencia/`; **sin** `.venv`, `__pycache__` ni `.env`; si se incluye `.git`, historial limpio de credenciales reales (SU-03: una contraseña subida y borrada sigue en el historial y exige cambiarla)
-- **Dependencias**: CH-09, CH-11
+- **Dependencias**: CH-09, CH-11, CH-15
 - **Governance**: BAJO
 - **Leer antes**:
   - `knowledge-base/12_despliegue_docker_y_vps.md` §Casos D y §Entrega (cátedra)
   - `knowledge-base/06_funcionalidades.md` §Casos de prueba mínimos (C-07: evidencia en consola)
   - `knowledge-base/01_vision_y_objetivos.md` §Alcance v1.0 y §Métricas de éxito
   - `knowledge-base/09_decisiones_y_supuestos.md` §SU-03 (entrega sin secretos)
+### [CH-15] `seed-fiel-enunciado`
+- **Estado**: `[ ]` pendiente
+- **Scope**: Alinear el dataset determinista de `app/seed.py` a los ejemplos del enunciado (27 filas: cliente 2 Tomás Ríos `tomas@example.com`, libros 1–5, sin precargar libro 6 / ISBN `978-950-00-0006-6`, venta 1 conservada) y transformar la estrategia de carga en reiniciable mediante `TRUNCATE TABLE ... RESTART IDENTITY CASCADE` de las 9 tablas del proyecto en una única transacción. Actualización de specs delta (`datos-iniciales`, `casos-http-c`), `.http` dependientes, `README.md` (sección seed) y `DEPLOY.md`.
+- **Dependencias**: CH-08, CH-09
+- **Governance**: MEDIO
+- **Leer antes**:
+  - `openspec/changes/ch-15-seed-fiel-enunciado/proposal.md`, `design.md`, `tasks.md`, y deltas en `specs/`
+  - `docs/Parcial_Cap1a4_Consigna.pdf` y `knowledge-base/`
 
 ---
 
