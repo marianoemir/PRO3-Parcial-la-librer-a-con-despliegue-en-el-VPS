@@ -1,0 +1,14 @@
+# D-02 (acceso desde afuera) — GET /health/ready contra la URL pública
+# Ejecutado desde la PC del grupo (fuera del VPS). Salida real de consola.
+
+PS C:\Users\Mariano_Chirino\Documents\GitHub\PRO3-Parcial-la-librer-a-con-despliegue-en-el-VPS> curl.exe -i http://179.199.129.73:8000/health/ready
+HTTP/1.1 200 OK
+date: Thu, 12 Nov 2026 00:45:11 GMT
+server: uvicorn
+content-length: 18
+content-type: application/json
+
+{"estado":"listo"}
+
+# Resultado: la aplicación responde 200 con {"estado":"listo"} en http://179.199.129.73:8000
+# desde fuera del servidor (12/11/2026 00:45 UTC = 11/11/2026 21:45 hora de Argentina).

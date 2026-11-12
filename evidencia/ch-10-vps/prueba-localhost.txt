@@ -1,0 +1,42 @@
+# Prueba con localhost — DATABASE_URL apuntando a localhost falla (ejecutado en el VPS)
+# Salida real de consola. La contraseña del archivo de prueba es falsa ("cualquiera"):
+# con localhost nunca llega a conectar. Traceback intermedio abreviado donde se indica.
+
+root@srv1926813:~/libreria# printf 'DATABASE_URL=postgresql+asyncpg://libreria_app:cualquiera@localhost:5432/libreria\nSQL_ECHO=false\n' > /root/libreria-localhost.env
+root@srv1926813:~/libreria# docker rm -f libreria
+libreria
+root@srv1926813:~/libreria# docker run --name libreria --network easypanel-grupo10 --env-file /root/libreria-localhost.env libreria; echo "EXIT=$?"
+INFO:     Started server process [1]
+INFO:     Waiting for application startup.
+ERROR:    Traceback (most recent call last):
+  File "/usr/local/lib/python3.12/site-packages/starlette/routing.py", line 661, in lifespan
+    async with self.lifespan_context(app) as maybe_state:
+  [... frames intermedios de fastapi/starlette omitidos ...]
+  File "/app/app/main.py", line 58, in lifespan
+    async with engine.begin() as conn:
+  [... frames intermedios de sqlalchemy/asyncpg omitidos ...]
+  File "/usr/local/lib/python3.12/site-packages/asyncpg/connect_utils.py", line 996, in _create_ssl_connection
+    tr, pr = await loop.create_connection(
+  File "uvloop/loop.pyx", line 2040, in create_connection
+  File "uvloop/loop.pyx", line 2017, in uvloop.loop.Loop.create_connection
+ConnectionRefusedError: [Errno 111] Connection refused
+
+ERROR:    Application startup failed. Exiting.
+EXIT=3
+
+root@srv1926813:~/libreria# docker ps -a --filter name=libreria
+CONTAINER ID   IMAGE      COMMAND                  CREATED         STATUS                              PORTS     NAMES
+b42bc7e2ac98   libreria   "uvicorn app.main:ap…"   2 seconds ago   Exited (3) Less than a second ago             libreria
+
+root@srv1926813:~/libreria# docker logs libreria 2>&1 | tail -n 6
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "uvloop/loop.pyx", line 2040, in create_connection
+  File "uvloop/loop.pyx", line 2017, in uvloop.loop.Loop.create_connection
+ConnectionRefusedError: [Errno 111] Connection refused
+
+ERROR:    Application startup failed. Exiting.
+
+# Resultado: con localhost en DATABASE_URL, el arranque falla con "Connection refused"
+# (dentro del contenedor, localhost es el propio contenedor, no el servidor/la base).
+# El proceso termina con error (EXIT=3, contenedor Exited (3)) y no queda sirviendo.
+# La base se alcanza por el nombre del servicio (grupo10_db) en la red easypanel-grupo10.

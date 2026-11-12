@@ -1,0 +1,27 @@
+# D-01 — Imagen base y imagen del proyecto (ejecutado en el VPS)
+# Salida real de consola. Sin credenciales, hosts ni IPs.
+
+root@srv1926813:~/libreria# head -n 3 Dockerfile
+FROM python:3.12-alpine
+
+WORKDIR /app
+
+root@srv1926813:~/libreria# docker pull python:3.12-alpine
+3.12-alpine: Pulling from library/python
+Digest: sha256:e064671ca452259bab50e8e2c7bd896e39e9a343bb06ca25234adf6fe18d0fc7
+Status: Downloaded newer image for python:3.12-alpine
+docker.io/library/python:3.12-alpine
+
+root@srv1926813:~/libreria# docker images python
+                                                                                                    i Info →   U  In Use
+IMAGE                ID             DISK USAGE   CONTENT SIZE   EXTRA
+python:3.12-alpine   e064671ca452       74.8MB         18.7MB
+
+root@srv1926813:~/libreria# docker images libreria
+                                                                                                    i Info →   U  In Use
+IMAGE             ID             DISK USAGE   CONTENT SIZE   EXTRA
+libreria:latest   7a86226d94d3        264MB         61.3MB
+
+# Resultado: python:3.12-alpine ocupa 74,8 MB en disco (por debajo de los 100 MB)
+# y el Dockerfile parte de ella (FROM python:3.12-alpine).
+# Build en el servidor: docker build -t libreria .  ->  EXIT=0

@@ -1,0 +1,16 @@
+# Recuperación — docker rm -f libreria y el mismo docker run vuelven a healthy (ejecutado en el VPS)
+# Salida real de consola. Sin credenciales, hosts ni IPs.
+
+root@srv1926813:~/libreria# docker rm -f libreria
+libreria
+root@srv1926813:~/libreria# docker run -d --name libreria --network easypanel-grupo10 -p 8000:8000 --restart unless-stopped --env-file /root/libreria.env libreria
+0eb5a06a7ff86934e2a6bb96ef3735b36145c665814d953bda05cf2185c250bf
+
+root@srv1926813:~/libreria# docker ps --filter name=libreria
+CONTAINER ID   IMAGE      COMMAND                  CREATED          STATUS                    PORTS                                         NAMES
+0eb5a06a7ff8   libreria   "uvicorn app.main:ap…"   46 seconds ago   Up 45 seconds (healthy)   0.0.0.0:8000->8000/tcp, [::]:8000->8000/tcp   libreria
+
+root@srv1926813:~/libreria# docker inspect libreria --format '{{.State.Health.Status}}'
+healthy
+
+# Resultado: tras eliminar el contenedor y repetir el mismo docker run, vuelve a estar healthy.

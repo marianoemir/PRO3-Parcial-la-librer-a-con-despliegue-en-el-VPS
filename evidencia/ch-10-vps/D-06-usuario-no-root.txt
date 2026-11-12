@@ -1,0 +1,11 @@
+# D-06 — Usuario del proceso dentro del contenedor (ejecutado en el VPS)
+# Salida real de consola. Sin credenciales, hosts ni IPs.
+
+root@srv1926813:~/libreria# docker ps --filter name=libreria
+CONTAINER ID   IMAGE      COMMAND                  CREATED          STATUS                    PORTS                                         NAMES
+7aaf2ad8f1c4   libreria   "uvicorn app.main:ap…"   10 minutes ago   Up 10 minutes (healthy)   0.0.0.0:8000->8000/tcp, [::]:8000->8000/tcp   libreria
+
+root@srv1926813:~/libreria# docker exec libreria id
+uid=1000(appuser) gid=1000(appuser) groups=1000(appuser)
+
+# Resultado: el proceso corre como appuser (uid 1000), no como root (uid 0).
