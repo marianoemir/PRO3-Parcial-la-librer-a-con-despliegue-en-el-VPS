@@ -8,6 +8,7 @@ Parcial de Programación 3 Backend: Una librería de barrio necesita una API par
 
 ## URL pública
 - `http://libreria.marianochirino.me:8000` (despliegue en el VPS vía HTTP).
+- Abrir con `http://` (no `https://`): la API sirve HTTP plano en el puerto 8000. Si el navegador redirige a https, probar con `http://179.199.129.73:8000/docs`.
 - Documentación interactiva Swagger UI: `http://libreria.marianochirino.me:8000/docs`
 - Chequeo de preparación / salud: `http://libreria.marianochirino.me:8000/health/ready` (y `http://libreria.marianochirino.me:8000/health/live`)
 - *Nota sobre endpoints*: La raíz `/` y `/health` devuelven `404 Not Found` (comportamiento normal y esperado, ya que los endpoints definidos en el enunciado inician en `/health/live`, `/health/ready`, `/docs`, `/libros/`, etc.).
@@ -57,6 +58,39 @@ Para poner en marcha la aplicación en una máquina local desde un clon limpio d
 ## Entorno
 - Según lo indicado por el profesor, la aplicación usa el PostgreSQL de la calculadora del grupo (`grupo10_db`); no se pidieron datos de acceso adicionales. La base propia es `libreria`, con rol `libreria_app`.
 - En el VPS la base no forma parte de la imagen y no se usa Docker Compose. Toda la configuración de despliegue se encuentra documentada en [DEPLOY.md](DEPLOY.md).
+
+## Casos de prueba
+
+A continuación se detalla la correspondencia entre los casos de prueba de la consigna (`C-01` a `C-08`), su archivo ejecutable en `test/` y el rótulo exacto de la petición:
+
+| Caso | Archivo | Rótulo exacto de request |
+|------|---------|--------------------------|
+| C-01 | `test/ch09-casos-http-c.http` | `### C-01 — path no entero: FastAPI debe rechazar antes del handler` |
+| C-02a | `test/ch09-casos-http-c.http` | `### C-02a — ISBN del libro 1 repetido con el resto del cuerpo válido` |
+| C-02b | `test/ch09-casos-http-c.http` | `### C-02b — email de cliente ya existente en el seed (cliente 2 Tomás Ríos)` |
+| C-03 | `test/ch09-casos-http-c.http` | `### C-03 — segundo perfil para el cliente 1, que ya lo tiene en el seed` |
+| C-04a | `test/ch09-casos-http-c.http` | `### C-04a — editorial inexistente dentro de int4` |
+| C-04b | `test/ch09-casos-http-c.http` | `### C-04b — autor inexistente dentro de int4` |
+| C-05 (1) | `test/ch07-ventas-errores.http` | `### 409 - POST venta con cliente_id inexistente (C-05 / Task 2.3)` |
+| C-05 (2) | `test/ch07-ventas-errores.http` | `### 409 - POST venta con libro_id inexistente en renglones (C-05 / Task 2.1)` |
+| C-06 | `test/ch08-seed-datos-iniciales.http` | `### Ejemplo enunciado / C-06 — POST /ventas/ produce id 2 y total 77000.00` |
+| C-07-prep | `test/ch09-c07-consultas-fijas.http` | `### C-07-prep — crear libro con varias autorías (ejemplo del enunciado)` |
+| C-07a | `test/ch09-c07-consultas-fijas.http` | `### C-07a — libro 1 del seed (una autoría)` |
+| C-07b | `test/ch09-c07-consultas-fijas.http` | `### C-07b — libro con varias autorías creado en C-07-prep` |
+| C-07c | `test/ch09-c07-consultas-fijas.http` | `### C-07c — detalle venta con dos renglones (creada en ch08 o venta 1 del seed)` |
+| C-07d | `test/ch09-c07-consultas-fijas.http` | `### C-07d — venta auxiliar válida (un renglón)` |
+| C-07e | `test/ch09-c07-consultas-fijas.http` | `### C-07e — detalle venta auxiliar con un renglón` |
+| C-08 | `test/ch09-casos-http-c.http` | `### C-08 — intento de inyección en filtro de título` |
+
+### Notas operativas sobre orden de ejecución y seed
+
+- **Prerrequisito obligatorio**: Usar una base local dedicada, vacía y autorizada para pruebas. Iniciar la API una vez para que el lifespan cree el esquema; después ejecutar `python -m app.seed` (reinicia las 9 tablas al dataset de 27 filas) y volver a dejar la API en escucha.
+- **Orden del ciclo limpio**: `C-01`, `C-02`, `C-03`, `C-04`, `C-08`, `C-05` (desde `test/ch07-ventas-errores.http`).
+- **Reinicio del seed antes de C-06 y C-07**: Antes de ejecutar C-06 (en `test/ch08-seed-datos-iniciales.http`) y antes de C-07 (en `test/ch09-c07-consultas-fijas.http`), correr `python -m app.seed` (es repetible), porque los INSERT fallidos de las pruebas previas (C-02a, C-04a, C-04b, C-05) consumen valores de secuencia (`nextval`) en PostgreSQL aun cuando la transacción hace rollback.
+- **Comparación de consultas fijas (C-07)**: Reiniciar localmente la API con diagnóstico SQL habilitado (`SQL_ECHO=true`) y comparar en consola las consultas de cada par:
+  - Libro 1 (1 autoría, del seed) vs libro creado por el ejemplo (2 autorías) -> 3 SELECT fijos.
+  - Venta con dos renglones vs venta auxiliar con un renglón -> 2 SELECT fijos.
+- **Casos de despliegue en VPS (D-01 a D-07)**: Su ejecución, evidencias y trazabilidad en servidor están documentadas en [evidencia/LEEME.md](evidencia/LEEME.md) y [DEPLOY.md](DEPLOY.md).
 
 ## Evidencia de pruebas y despliegue
 Las evidencias requeridas de consultas y despliegue se organizan en dos ubicaciones principales:
