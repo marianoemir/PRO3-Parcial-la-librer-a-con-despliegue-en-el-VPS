@@ -51,7 +51,7 @@ GET {{base}}/libros/1
 # La cantidad de consultas debe ser fija e igual a C-07a (3 SELECT).
 GET {{base}}/libros/{{crearLibro.response.body.$.id}}
 
-### C-07c — detalle venta con dos renglones (creada en ch08 o venta 1 del seed)
+### C-07c — detalle venta con dos renglones (venta 1 del seed)
 # Esperado: 200; cliente Tomás Ríos (tomas@example.com); renglones libro 1 x2 y libro 4 x1; total "77000.00".
 # Comparar consultas con C-07e (2 SELECT fijos).
 GET {{base}}/ventas/2

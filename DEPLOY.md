@@ -2,18 +2,16 @@
 
 **URL pública:** http://libreria.marianochirino.me:8000 (documentación en `/docs`, estado en `/health/ready`; HTTP plano, no https).
 
-> Lo marcado **[A COMPLETAR]** se confirma al cerrar el despliegue final.
-
 ## URL pública
 - `http://libreria.marianochirino.me:8000` (IP del VPS: 179.199.129.73; verificado desde afuera del VPS el 12/11/2026 a las 17:30, hora de Argentina, después del último `docker run`: `GET /libros/` y `GET /ventas/2` responden 200 con los datos cargados).
 - Salud: `GET /health/live` y `GET /health/ready`. Documentación interactiva: `/docs`.
 
 ## Día y hora del despliegue
 - Primer despliegue: miércoles 11/11/2026, 21:24 (hora de Argentina, UTC−3). El servidor lo registró como `Thu Nov 12 00:24:12 UTC 2026`.
-- Despliegue vigente (contenedor recreado en la prueba D-04, con los datos iniciales ya cargados): jueves 12/11/2026, 17:30 (hora de Argentina), con el seed nuevo (27 filas). Quedó `healthy` y respondió 200 desde afuera. **[A COMPLETAR: actualizar si se vuelve a recrear el contenedor]**
+- Despliegue vigente (contenedor recreado en la prueba D-04, con los datos iniciales ya cargados): jueves 12/11/2026, 17:30 (hora de Argentina), con el seed nuevo (27 filas). Quedó `healthy` y respondió 200 desde afuera. Si se vuelve a recrear el contenedor, esta hora se actualiza.
 
 ## Entorno
-- Servidor: VPS con Ubuntu y Docker 29.8.0. **[A COMPLETAR: VPS asignado por la cátedra / propio del grupo]**
+- Servidor: VPS con Ubuntu y Docker 29.8.0, propio de un integrante del grupo (no lo asignó la cátedra). Ya se usaba para el proyecto de Frontend del grupo (la calculadora) y las dos materias comparten el servidor.
 - Base de datos: PostgreSQL 18 que ya corre en el servidor como contenedor (servicio `grupo10_db`), base propia `libreria` con usuario propio (`libreria_app`). Según lo indicado por el profesor, la aplicación usa el PostgreSQL de la calculadora del grupo (`grupo10_db`); no se pidieron datos de acceso adicionales. La consigna indica PostgreSQL 16: con la 18 el arranque completo funciona, `create_all` crea las 9 tablas y asyncpg conecta sin problemas (ver `evidencia/ch-10-vps/D-02-despliegue-limpio.txt`).
 - La base no forma parte de la imagen y no se usa Docker Compose.
 - Imagen base `python:3.12-alpine` (74,8 MB en disco, medido en el VPS; ver `evidencia/ch-10-vps/D-01-imagenes.txt`). La imagen `libreria` ocupa 264 MB en disco.
