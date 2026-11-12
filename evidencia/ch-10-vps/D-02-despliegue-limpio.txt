@@ -1,0 +1,75 @@
+# D-02 — Servidor limpio: docker build y docker run; después docker ps (ejecutado en el VPS)
+# Salida real de consola. Sin credenciales, hosts ni IPs.
+
+## 1. Build en el servidor
+root@srv1926813:~/libreria# docker build -t libreria . > /root/ch10-build.log 2>&1; echo "EXIT=$?"
+EXIT=0
+root@srv1926813:~/libreria# tail -n 15 /root/ch10-build.log
+#10 [6/6] RUN adduser -D -s /sbin/nologin appuser && chown -R appuser:appuser /app
+#10 DONE 0.4s
+
+#11 exporting to image
+#11 exporting layers
+#11 exporting layers 7.6s done
+#11 exporting manifest sha256:1fc1c5376e8d572c9a4320720ec2a39820d8d25e939ae721fb91b7187f01d0be
+#11 exporting manifest sha256:1fc1c5376e8d572c9a4320720ec2a39820d8d25e939ae721fb91b7187f01d0be 0.0s done
+#11 exporting config sha256:04e11e1e8e067ef3ea2fd1388062048fe593b1d9623ae56880ab6ecdcdb2b0c9 done
+#11 exporting attestation manifest sha256:faf26bac8f05ae9e5ff761e7a662f5544de4f95153b96d5bf0e1da5b2594c5da 0.0s done
+#11 exporting manifest list sha256:7a86226d94d34f9b5f478e7875ebc0c5737e86b19b79a46c51d75261c4512e98 done
+#11 naming to docker.io/library/libreria:latest done
+#11 unpacking to docker.io/library/libreria:latest
+#11 unpacking to docker.io/library/libreria:latest 3.1s done
+#11 DONE 10.8s
+
+## 2. Run
+root@srv1926813:~/libreria# date
+Thu Nov 12 00:24:12 UTC 2026
+root@srv1926813:~/libreria# docker rm -f libreria 2>/dev/null
+root@srv1926813:~/libreria# docker run -d --name libreria --network easypanel-grupo10 -p 8000:8000 --restart unless-stopped --env-file /root/libreria.env libreria
+7aaf2ad8f1c4f17f511633ddaa8ab19bd5893a811f6895b5cd42556d5e92c6e7
+
+## 3. Estado
+root@srv1926813:~/libreria# docker ps --filter name=libreria
+CONTAINER ID   IMAGE      COMMAND                  CREATED          STATUS                    PORTS                                         NAMES
+7aaf2ad8f1c4   libreria   "uvicorn app.main:ap…"   10 minutes ago   Up 10 minutes (healthy)   0.0.0.0:8000->8000/tcp, [::]:8000->8000/tcp   libreria
+
+root@srv1926813:~/libreria# docker inspect libreria --format '{{.State.Health.Status}}'
+healthy
+
+## 4. Arranque completo (docker logs)
+root@srv1926813:~/libreria# docker logs libreria 2>&1 | head -n 15
+INFO:     Started server process [1]
+INFO:     Waiting for application startup.
+INFO:     Arranque completado; tablas creadas: ['autor', 'cliente', 'editorial', 'genero', 'libro', 'libro_autor', 'perfil_cliente', 'renglon_venta', 'venta']
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+INFO:     127.0.0.1:51430 - "GET /health/ready HTTP/1.1" 200 OK
+INFO:     127.0.0.1:48446 - "GET /health/ready HTTP/1.1" 200 OK
+INFO:     127.0.0.1:36808 - "GET /health/ready HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52154 - "GET /health/ready HTTP/1.1" 200 OK
+INFO:     127.0.0.1:48138 - "GET /health/ready HTTP/1.1" 200 OK
+INFO:     127.0.0.1:37100 - "GET /health/ready HTTP/1.1" 200 OK
+INFO:     127.0.0.1:33698 - "GET /health/ready HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58384 - "GET /health/ready HTTP/1.1" 200 OK
+INFO:     127.0.0.1:41320 - "GET /health/ready HTTP/1.1" 200 OK
+INFO:     127.0.0.1:48090 - "GET /health/ready HTTP/1.1" 200 OK
+
+## 5. Tablas en la base libreria
+root@srv1926813:~/libreria# docker exec $(docker ps -qf name=grupo10_db) sh -c 'psql -P pager=off -U "$POSTGRES_USER" -d libreria -c "\dt"'
+                 List of tables
+ Schema |      Name      | Type  |    Owner
+--------+----------------+-------+--------------
+ public | autor          | table | libreria_app
+ public | cliente        | table | libreria_app
+ public | editorial      | table | libreria_app
+ public | genero         | table | libreria_app
+ public | libro          | table | libreria_app
+ public | libro_autor    | table | libreria_app
+ public | perfil_cliente | table | libreria_app
+ public | renglon_venta  | table | libreria_app
+ public | venta          | table | libreria_app
+(9 rows)
+
+# Resultado: build en el servidor con EXIT=0; contenedor healthy; el log muestra el
+# arranque completo con las 9 tablas creadas. El acceso desde afuera (curl) va en
+# D-02-acceso-externo.txt.
