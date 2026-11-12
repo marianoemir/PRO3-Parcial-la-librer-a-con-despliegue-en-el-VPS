@@ -1,0 +1,71 @@
+# D-03 — Datos iniciales cargados; desde afuera del VPS, en la URL pública:
+#        GET /health/ready, GET /libros/ y POST /ventas/ con el cuerpo de ejemplo del caso C-06
+# Salida real de consola. El seed se ejecutó en el VPS; los curl, desde la PC del grupo (fuera del servidor).
+
+## 1. Datos iniciales (en el VPS)
+root@srv1926813:~/libreria# docker exec libreria ls -l app/seed.py
+-rw-r--r--    1 appuser  appuser      23868 Nov 12 00:17 app/seed.py
+root@srv1926813:~/libreria# docker exec libreria python -m app.seed
+Datos iniciales (seed) — librería
+
+Tabla             Insertadas   Ya existían
+------------------------------------------
+editorial                  2             0
+genero                     2             0
+autor                      5             0
+libro                      6             0
+libro_autor                7             0
+cliente                    3             0
+perfil_cliente             2             0
+venta                      1             0
+renglon_venta              2             0
+------------------------------------------
+Total                     30             0
+
+Ids del dataset:
+  editorial: 1, 2
+  genero: 1, 2
+  autor: 1, 2, 3, 4, 5
+  libro: 1, 2, 3, 4, 5, 6
+  libro_autor: (libro 1, autor 1), (libro 2, autor 1), (libro 3, autor 3), (libro 4, autor 2), (libro 5, autor 5), (libro 6, autor 3), (libro 6, autor 4)
+  cliente: 1, 2, 3
+  perfil_cliente: 1, 2
+  venta: 1
+  renglon_venta: 1, 2
+
+Secuencias alineadas con el máximo id cargado de cada tabla.
+
+## 2. GET /health/ready (desde la PC del grupo)
+PS> curl.exe -i http://179.199.129.73:8000/health/ready
+HTTP/1.1 200 OK
+date: Thu, 12 Nov 2026 01:11:25 GMT
+server: uvicorn
+content-length: 18
+content-type: application/json
+
+{"estado":"listo"}
+
+## 3. GET /libros/ (desde la PC del grupo)
+PS> curl.exe -i http://179.199.129.73:8000/libros/
+HTTP/1.1 200 OK
+date: Thu, 12 Nov 2026 01:11:25 GMT
+server: uvicorn
+content-length: 1339
+content-type: application/json
+
+[{"id":1,"isbn":"978-950-00-0001-1","titulo":"Rayuela","precio":"25000.00","stock":10,"editorial_id":1,"genero_id":1,"editorial":{"id":1,"nombre":"Sudamericana","pais":"Argentina"},"genero":{"id":1,"nombre":"Novela"}},{"id":2,"isbn":"978-950-00-0002-8","titulo":"Bestiario","precio":"18000.00","stock":6,"editorial_id":1,"genero_id":2,"editorial":{"id":1,"nombre":"Sudamericana","pais":"Argentina"},"genero":{"id":2,"nombre":"Cuento"}},{"id":3,"isbn":"978-950-00-0003-5","titulo":"La invención de Morel","precio":"20000.00","stock":5,"editorial_id":1,"genero_id":1,"editorial":{"id":1,"nombre":"Sudamericana","pais":"Argentina"},"genero":{"id":1,"nombre":"Novela"}},{"id":4,"isbn":"978-950-00-0004-2","titulo":"Respiración artificial","precio":"27000.00","stock":7,"editorial_id":2,"genero_id":1,"editorial":{"id":2,"nombre":"Anagrama","pais":"España"},"genero":{"id":1,"nombre":"Novela"}},{"id":5,"isbn":"978-950-00-0005-9","titulo":"El túnel","precio":"19500.00","stock":3,"editorial_id":1,"genero_id":1,"editorial":{"id":1,"nombre":"Sudamericana","pais":"Argentina"},"genero":{"id":1,"nombre":"Novela"}},{"id":6,"isbn":"978-950-00-0006-6","titulo":"Los que aman, odian","precio":"21000.00","stock":4,"editorial_id":1,"genero_id":1,"editorial":{"id":1,"nombre":"Sudamericana","pais":"Argentina"},"genero":{"id":1,"nombre":"Novela"}}]
+
+## 4. POST /ventas/ con el cuerpo de ejemplo del caso C-06 (desde la PC del grupo)
+PS> '{"cliente_id":2,"renglones":[{"libro_id":1,"cantidad":2},{"libro_id":4,"cantidad":1}]}' | Set-Content -Encoding ascii venta.json
+PS> curl.exe -i -X POST http://179.199.129.73:8000/ventas/ -H "Content-Type: application/json" --data-binary "@venta.json"
+HTTP/1.1 201 Created
+date: Thu, 12 Nov 2026 01:11:26 GMT
+server: uvicorn
+content-length: 366
+content-type: application/json
+
+{"id":2,"fecha":"2026-11-12T01:11:26.805132Z","total":"77000.00","cliente":{"id":2,"nombre":"Bruno Díaz","email":"bruno.diaz@example.com"},"renglones":[{"libro_id":1,"titulo":"Rayuela","cantidad":2,"precio_unitario":"25000.00","subtotal":"50000.00"},{"libro_id":4,"titulo":"Respiración artificial","cantidad":1,"precio_unitario":"27000.00","subtotal":"27000.00"}]}
+PS> Remove-Item venta.json
+
+# Resultado: 200 en /health/ready; 200 con los 6 libros del seed; 201 con los precios copiados de cada
+# libro (25000.00 y 27000.00) y el total calculado por el servidor (2 x 25000.00 + 1 x 27000.00 = 77000.00).
