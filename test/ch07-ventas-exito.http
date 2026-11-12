@@ -38,7 +38,7 @@ GET {{base}}/ventas/?limit=20&offset=0
 # - Aparece ~0.75s después del response (TIME_AFTER_SLEEP evidencia ~0.9s tras request). No se cambió nivel de logger; se usó logging.getLogger("uvicorn.error").
 
 ### C-07 evidencia (Task 4.5): consultas fijas sin N+1 (1 renglon vs 3 renglones)
-# Ver evidencia/C-07-ventas-consultas.txt (copiada de consola con SQL_ECHO=true, sin resumir)
+# Ver evidencia/ch-07-local/C-07-ventas-consultas.txt (copiada de consola con SQL_ECHO=true, sin resumir)
 # GET /ventas/11 (1 renglon, libro 45): 2 SELECTs de datos (venta+cliente join, renglones+libro join IN venta_id) + ROLLBACK
 # GET /ventas/12 (3 renglones, libros 45,46,47): 2 SELECTs de datos (misma forma, [cached]) + ROLLBACK
 # Misma cantidad de consultas para resolver el detalle independientemente de la cantidad de renglones.

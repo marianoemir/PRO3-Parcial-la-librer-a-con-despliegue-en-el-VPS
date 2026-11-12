@@ -1,5 +1,68 @@
 # PRO3-Parcial-la-librer-a-con-despliegue-en-el-VPS
-Parcial de Programacion 3 Backend: Una librería de barrio necesita una API para su catálogo y sus ventas
+Parcial de Programación 3 Backend: Una librería de barrio necesita una API para su catálogo y sus ventas.
+
+## Integrantes
+- Mariano Chirino
+- Facundo Quiroga
+- Andrés Fabre
+
+## URL pública
+- `http://libreria.marianochirino.me:8000` (despliegue en el VPS vía HTTP).
+- Documentación interactiva Swagger UI: `http://libreria.marianochirino.me:8000/docs`
+- Chequeo de preparación / salud: `http://libreria.marianochirino.me:8000/health/ready` (y `http://libreria.marianochirino.me:8000/health/live`)
+- *Nota sobre endpoints*: La raíz `/` y `/health` devuelven `404 Not Found` (comportamiento normal y esperado, ya que los endpoints definidos en el enunciado inician en `/health/live`, `/health/ready`, `/docs`, `/libros/`, etc.).
+
+## Pasos para levantar el proyecto desde cero en local
+
+Para poner en marcha la aplicación en una máquina local desde un clon limpio del repositorio:
+
+1. **Crear y activar el entorno virtual (venv)**:
+   ```bash
+   python -m venv .venv
+   # En Windows PowerShell:
+   .\.venv\Scripts\Activate.ps1
+   # En Linux/macOS:
+   source .venv/bin/activate
+   ```
+
+2. **Instalar dependencias**:
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+3. **Configurar variables de entorno desde env.example**:
+   Copiar el archivo de plantilla a `.env` (el archivo `.env` nunca se versiona):
+   ```bash
+   # En Windows PowerShell:
+   Copy-Item env.example .env
+   # En Linux/macOS:
+   cp env.example .env
+   ```
+   Editar `.env` indicando la `DATABASE_URL` correspondiente a una base PostgreSQL vacía (driver `postgresql+asyncpg`, ej: `postgresql+asyncpg://postgres:tu_password@localhost:5432/libreria`).
+
+4. **Crear las tablas arrancando el servidor**:
+   Al arrancar la aplicación, el lifespan ejecuta `SQLModel.metadata.create_all` creando automáticamente las 9 tablas requeridas:
+   ```bash
+   uvicorn app.main:app --host 127.0.0.1 --port 8000
+   ```
+   Verificar en consola el mensaje `Application startup complete` y detener con `Ctrl+C` (o dejarlo corriendo en otra terminal).
+
+5. **Cargar los datos iniciales (seed)**:
+   Con el esquema ya creado, ejecutar el comando de carga inicial (ver sección [Datos iniciales (seed)](#datos-iniciales-seed)):
+   ```bash
+   python -m app.seed
+   ```
+   Esto dejará la base en el estado determinista documentado de 27 filas.
+
+## Entorno
+- Según lo indicado por el profesor, la aplicación usa el PostgreSQL de la calculadora del grupo (`grupo10_db`); no se pidieron datos de acceso adicionales. La base propia es `libreria`, con rol `libreria_app`.
+- En el VPS la base no forma parte de la imagen y no se usa Docker Compose. Toda la configuración de despliegue se encuentra documentada en [DEPLOY.md](DEPLOY.md).
+
+## Evidencia de pruebas y despliegue
+Las evidencias requeridas de consultas y despliegue se organizan en dos ubicaciones principales:
+- `evidencia/`: contiene la evidencia vigente de consultas SQL sin N+1 (`C-07-consola-sql.log` y `C-07-conteo.txt`), y los casos D probados contra la URL pública y el VPS (`D-03-url-publica.txt`, `D-04-persistencia.txt` y `D-07-aviso-comprobante.txt`).
+- `evidencia/ch-10-vps/`: contiene la evidencia del despliegue inicial en el servidor (`D-01-imagenes.txt`, `D-02-despliegue-limpio.txt`, `D-02-acceso-externo.txt`, `D-05-sin-database-url.txt`, `D-06-usuario-no-root.txt`, `recuperacion-healthy.txt` y `prueba-localhost.txt`).
+Para más detalles sobre la estructura y trazabilidad histórica, consultar [evidencia/LEEME.md](evidencia/LEEME.md).
 
 ## Datos iniciales (seed)
 
