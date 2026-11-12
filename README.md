@@ -1,17 +1,18 @@
 # PRO3-Parcial-la-librer-a-con-despliegue-en-el-VPS
 Parcial de Programación 3 Backend: Una librería de barrio necesita una API para su catálogo y sus ventas.
 
-## Integrantes
-- Mariano Chirino
-- Facundo Quiroga
-- Andrés Fabre
+**Programación III · Entrega Parcial 2 · Comisión 1**
+**Grupo 10 (Lobos Solitarios)**
 
-## URL pública
-- `http://libreria.marianochirino.me:8000` (despliegue en el VPS vía HTTP).
-- Abrir con `http://` (no `https://`): la API sirve HTTP plano en el puerto 8000. Si el navegador redirige a https, probar con `http://179.199.129.73:8000/docs`.
-- Documentación interactiva Swagger UI: `http://libreria.marianochirino.me:8000/docs`
-- Chequeo de preparación / salud: `http://libreria.marianochirino.me:8000/health/ready` (y `http://libreria.marianochirino.me:8000/health/live`)
-- *Nota sobre endpoints*: La raíz `/` y `/health` devuelven `404 Not Found` (comportamiento normal y esperado, ya que los endpoints definidos en el enunciado inician en `/health/live`, `/health/ready`, `/docs`, `/libros/`, etc.).
+Integrantes:
+- Mariano Chirino (usuario de GitHub: marianoemir) - Legajo 41031
+- Andrés Fabre (usuario de GitHub: andresfabre27) - Legajo 53885
+- Facundo Quiroga (usuario de GitHub: Buhonero009) - Legajo 52737
+
+**API en línea:** http://libreria.marianochirino.me:8000
+- Documentación (Swagger): http://libreria.marianochirino.me:8000/docs
+- Estado: http://libreria.marianochirino.me:8000/health/ready
+- Abrir con `http://` (no `https://`): la API sirve HTTP plano en el puerto 8000. Si el navegador redirige a https, probar con `http://179.199.129.73:8000/docs`. La raíz `/` y `/health` dan 404, es lo esperado.
 
 ## Pasos para levantar el proyecto desde cero en local
 
