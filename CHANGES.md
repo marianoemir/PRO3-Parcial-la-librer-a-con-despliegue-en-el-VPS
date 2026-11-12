@@ -279,7 +279,7 @@ Paso │ Agente A (Backend Core) │ Agente B (Backend Aux)        │ Agente C 
 ## FASE 3 — Contenedor, despliegue y entrega
 
 ### [CH-10] `despliegue-vps-inicial`
-- **Estado**: `[ ]` pendiente
+- **Estado**: `[x]` archivado (2026-11-11)
 - **Scope**: Despliegue inicial en el VPS — change propio de infraestructura en producción, detección temprana de red y `host.docker.internal` (D-02, D-05, D-06; más contenedor vuelve a `healthy` tras `docker rm -f` + `run`)
   - Dueño potencial: Agente C (Infra/DevOps) — una sesión (~4-6 h)
   - Casos cubiertos: D-02 (build + run limpio, contenedor `healthy`), D-05 (sin `DATABASE_URL` el contenedor no queda sirviendo), D-06 (usuario del proceso no root); más contenedor vuelve a `healthy` tras `docker rm -f` + `run`
