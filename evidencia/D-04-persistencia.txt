@@ -1,48 +1,28 @@
-# D-04 — docker rm -f libreria y el mismo docker run otra vez: vuelve a healthy y los datos siguen
-# Salida real de consola. Primero en el VPS; después, desde la PC del grupo (fuera del servidor).
-# La venta 2 se creó en D-03 (fecha 2026-11-12T01:11:26Z), antes de recrear el contenedor.
+# D-04 - docker rm -f libreria y el mismo docker run: vuelve a healthy y los datos siguen
+# Fecha: jueves 12/11/2026, 17:30:47 (hora de Argentina)
+# Nota: la IP del cliente se reemplazo por <IP-cliente>; el GET /libros/ de la PC esta abreviado (HTTP 200 y los 5 libros del seed; la salida completa de ese pedido es la de D-03); el resto es la salida tal cual.
 
-## 1. Recrear el contenedor (en el VPS)
-root@srv1926813:~/libreria# docker rm -f libreria
+## [VPS] docker rm -f libreria + docker run -d --name libreria --network easypanel-grupo10 -p 8000:8000 --restart unless-stopped --env-file /root/libreria.env libreria
 libreria
-root@srv1926813:~/libreria# docker run -d --name libreria --network easypanel-grupo10 -p 8000:8000 --restart unless-stopped --env-file /root/libreria.env libreria
-c577fd145d5a7b63fcdf8d53b154cb479be22c7b826d6a608cb1af7ed2d81f5b
+1869c553941c9fc8d907243b3503cbb9dcf853e796dc2d8db1b13d95c3a8f943
+1 starting
+2 starting
+3 healthy
+libreria                                                   Up 6 seconds (healthy)   0.0.0.0:8000->8000/tcp, [::]:8000->8000/tcp
+Thu Nov 12 17:30:47 -03 2026
 
-root@srv1926813:~/libreria# docker ps --filter name=libreria
-CONTAINER ID   IMAGE      COMMAND                  CREATED          STATUS                    PORTS                                         NAMES
-c577fd145d5a   libreria   "uvicorn app.main:ap…"   19 seconds ago   Up 18 seconds (healthy)   0.0.0.0:8000->8000/tcp, [::]:8000->8000/tcp   libreria
-root@srv1926813:~/libreria# docker inspect libreria --format '{{.State.Health.Status}}'
-healthy
+## [PC] GET /libros/ (contenedor nuevo): HTTP 200, los mismos 5 libros del seed (ids 1 a 5)
 
-## 2. Los datos siguen (desde la PC del grupo)
-PS> curl.exe -i http://179.199.129.73:8000/libros/
-HTTP/1.1 200 OK
-date: Thu, 12 Nov 2026 01:12:11 GMT
-server: uvicorn
-content-length: 1339
-content-type: application/json
+## [PC] GET /ventas/2 (contenedor nuevo)
+{"id":2,"fecha":"2026-11-12T20:30:31.081226Z","total":"77000.00","cliente":{"id":2,"nombre":"Tomás Ríos","email":"tomas@example.com"},"renglones":[{"libro_id":1,"titulo":"Rayuela","cantidad":2,"precio_unitario":"25000.00","subtotal":"50000.00"},{"libro_id":4,"titulo":"Respiración artificial","cantidad":1,"precio_unitario":"27000.00","subtotal":"27000.00"}]}
+HTTP 200
 
-[{"id":1,"isbn":"978-950-00-0001-1","titulo":"Rayuela","precio":"25000.00","stock":10,"editorial_id":1,"genero_id":1,"editorial":{"id":1,"nombre":"Sudamericana","pais":"Argentina"},"genero":{"id":1,"nombre":"Novela"}},{"id":2,"isbn":"978-950-00-0002-8","titulo":"Bestiario","precio":"18000.00","stock":6,"editorial_id":1,"genero_id":2,"editorial":{"id":1,"nombre":"Sudamericana","pais":"Argentina"},"genero":{"id":2,"nombre":"Cuento"}},{"id":3,"isbn":"978-950-00-0003-5","titulo":"La invención de Morel","precio":"20000.00","stock":5,"editorial_id":1,"genero_id":1,"editorial":{"id":1,"nombre":"Sudamericana","pais":"Argentina"},"genero":{"id":1,"nombre":"Novela"}},{"id":4,"isbn":"978-950-00-0004-2","titulo":"Respiración artificial","precio":"27000.00","stock":7,"editorial_id":2,"genero_id":1,"editorial":{"id":2,"nombre":"Anagrama","pais":"España"},"genero":{"id":1,"nombre":"Novela"}},{"id":5,"isbn":"978-950-00-0005-9","titulo":"El túnel","precio":"19500.00","stock":3,"editorial_id":1,"genero_id":1,"editorial":{"id":1,"nombre":"Sudamericana","pais":"Argentina"},"genero":{"id":1,"nombre":"Novela"}},{"id":6,"isbn":"978-950-00-0006-6","titulo":"Los que aman, odian","precio":"21000.00","stock":4,"editorial_id":1,"genero_id":1,"editorial":{"id":1,"nombre":"Sudamericana","pais":"Argentina"},"genero":{"id":1,"nombre":"Novela"}}]
-
-PS> curl.exe -i http://179.199.129.73:8000/ventas/2
-HTTP/1.1 200 OK
-date: Thu, 12 Nov 2026 01:12:12 GMT
-server: uvicorn
-content-length: 366
-content-type: application/json
-
-{"id":2,"fecha":"2026-11-12T01:11:26.805132Z","total":"77000.00","cliente":{"id":2,"nombre":"Bruno Díaz","email":"bruno.diaz@example.com"},"renglones":[{"libro_id":1,"titulo":"Rayuela","cantidad":2,"precio_unitario":"25000.00","subtotal":"50000.00"},{"libro_id":4,"titulo":"Respiración artificial","cantidad":1,"precio_unitario":"27000.00","subtotal":"27000.00"}]}
-
-## 3. El contenedor nuevo atendió esas peticiones (en el VPS)
-root@srv1926813:~/libreria# docker logs libreria 2>&1 | grep -v 127.0.0.1
+## [VPS] docker logs --tail 15 libreria (contenedor nuevo; no corrio el seed)
 INFO:     Started server process [1]
 INFO:     Waiting for application startup.
 INFO:     Arranque completado; tablas creadas: ['autor', 'cliente', 'editorial', 'genero', 'libro', 'libro_autor', 'perfil_cliente', 'renglon_venta', 'venta']
 INFO:     Application startup complete.
 INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
-INFO:     138.117.19.105:45507 - "GET /libros/ HTTP/1.1" 200 OK
-INFO:     138.117.19.105:45508 - "GET /ventas/2 HTTP/1.1" 200 OK
-
-# Resultado: tras eliminar el contenedor y repetir el mismo docker run, vuelve a estar healthy. Los 6 libros
-# del seed y la venta 2 (creada antes de recrear el contenedor) siguen ahí: los datos viven en la base del
-# servidor, no en el contenedor, y create_all solo crea las tablas que faltan. No se volvió a correr el seed.
+INFO:     <IP-cliente>:38957 - "GET /libros/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58192 - "GET /health/ready HTTP/1.1" 200 OK
+INFO:     <IP-cliente>:64102 - "GET /ventas/2 HTTP/1.1" 200 OK

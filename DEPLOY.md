@@ -3,12 +3,12 @@
 > Lo marcado **[A COMPLETAR]** se confirma al cerrar el despliegue final.
 
 ## URL pública
-- `http://179.199.129.73:8000` (verificado desde afuera del VPS el 11/11/2026 a las 22:12, hora de Argentina, después del último `docker run`: `GET /libros/` y `GET /ventas/2` responden 200 con los datos cargados).
+- `http://libreria.marianochirino.me:8000` (IP del VPS: 179.199.129.73; verificado desde afuera del VPS el 12/11/2026 a las 17:30, hora de Argentina, después del último `docker run`: `GET /libros/` y `GET /ventas/2` responden 200 con los datos cargados).
 - Salud: `GET /health/live` y `GET /health/ready`. Documentación interactiva: `/docs`.
 
 ## Día y hora del despliegue
 - Primer despliegue: miércoles 11/11/2026, 21:24 (hora de Argentina, UTC−3). El servidor lo registró como `Thu Nov 12 00:24:12 UTC 2026`.
-- Despliegue vigente (contenedor recreado en la prueba D-04, con los datos iniciales ya cargados): miércoles 11/11/2026, alrededor de las 22:12 (hora de Argentina). Quedó `healthy` y respondió 200 desde afuera. **[A COMPLETAR: actualizar si se vuelve a recrear el contenedor]**
+- Despliegue vigente (contenedor recreado en la prueba D-04, con los datos iniciales ya cargados): jueves 12/11/2026, 17:30 (hora de Argentina), con el seed nuevo (27 filas). Quedó `healthy` y respondió 200 desde afuera. **[A COMPLETAR: actualizar si se vuelve a recrear el contenedor]**
 
 ## Entorno
 - Servidor: VPS con Ubuntu y Docker 29.8.0. **[A COMPLETAR: VPS asignado por la cátedra / propio del grupo]**

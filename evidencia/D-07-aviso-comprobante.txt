@@ -1,23 +1,20 @@
-# D-07 — La venta registrada en el caso D-03: el aviso del comprobante aparece en docker logs
-#        después de la línea de la respuesta (ejecutado en el VPS)
-# Salida real de consola.
+# D-07 - Aviso del comprobante de la venta registrada en D-03
+# Fecha: jueves 12/11/2026, ~17:30 (hora de Argentina)
+# Nota: la IP del cliente se reemplazo por <IP-cliente>; el resto es la salida tal cual.
 
-root@srv1926813:~/libreria# docker logs libreria 2>&1 | tail -n 15
+## [VPS] docker logs --tail 15 libreria (inmediatamente despues del POST /ventas/ de D-03)
+INFO:     Arranque completado; tablas creadas: ['autor', 'cliente', 'editorial', 'genero', 'libro', 'libro_autor', 'perfil_cliente', 'renglon_venta', 'venta']
 INFO:     Application startup complete.
 INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
-INFO:     127.0.0.1:41024 - "GET /health/ready HTTP/1.1" 200 OK
-INFO:     127.0.0.1:37154 - "GET /health/ready HTTP/1.1" 200 OK
-INFO:     127.0.0.1:36196 - "GET /health/ready HTTP/1.1" 200 OK
-INFO:     127.0.0.1:50992 - "GET /health/ready HTTP/1.1" 200 OK
-INFO:     127.0.0.1:46854 - "GET /health/ready HTTP/1.1" 200 OK
-INFO:     127.0.0.1:39094 - "GET /health/ready HTTP/1.1" 200 OK
-INFO:     127.0.0.1:33214 - "GET /health/ready HTTP/1.1" 200 OK
-INFO:     127.0.0.1:47318 - "GET /health/ready HTTP/1.1" 200 OK
-INFO:     138.117.19.105:47767 - "GET /health/ready HTTP/1.1" 200 OK
-INFO:     138.117.19.105:47768 - "GET /libros/ HTTP/1.1" 200 OK
-INFO:     138.117.19.105:32937 - "POST /ventas/ HTTP/1.1" 201 Created
-INFO:     Aviso comprobante venta_id=2 email=bruno.diaz@example.com
-INFO:     127.0.0.1:49694 - "GET /health/ready HTTP/1.1" 200 OK
-
-# Resultado: la línea "POST /ventas/ ... 201 Created" va primero y, después, aparece
-# "Aviso comprobante venta_id=2 ...", la tarea en segundo plano (BackgroundTasks) de la venta del caso D-03.
+INFO:     127.0.0.1:42660 - "GET /health/ready HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60102 - "GET /health/ready HTTP/1.1" 200 OK
+INFO:     127.0.0.1:33658 - "GET /health/ready HTTP/1.1" 200 OK
+INFO:     127.0.0.1:48504 - "GET /health/ready HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49614 - "GET /health/ready HTTP/1.1" 200 OK
+INFO:     127.0.0.1:36646 - "GET /health/ready HTTP/1.1" 200 OK
+INFO:     127.0.0.1:33746 - "GET /health/ready HTTP/1.1" 200 OK
+INFO:     <IP-cliente>:64096 - "GET /health/ready HTTP/1.1" 200 OK
+INFO:     <IP-cliente>:38955 - "GET /libros/ HTTP/1.1" 200 OK
+INFO:     <IP-cliente>:64098 - "POST /ventas/ HTTP/1.1" 201 Created
+INFO:     Aviso comprobante venta_id=2 email=tomas@example.com
+INFO:     127.0.0.1:55092 - "GET /health/ready HTTP/1.1" 200 OK
