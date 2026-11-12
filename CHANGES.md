@@ -3,7 +3,7 @@
 > Índice canónico de todos los changes del proyecto **Parcial Programación III — La Librería con Despliegue en el VPS**.
 > Cada change es atómico: un agente puede implementarlo en una sesión (~4-6 horas).
 > **Leer este archivo antes de ejecutar cualquier `/opsx:propose`.**
-> **Convención de códigos**: `CH-01`–`CH-12` = changes propios de este roadmap; `C-01`–`C-08` = casos de prueba de la cátedra (no confundir). Los casos `D-01`–`D-07` son los de despliegue en VPS.
+> **Convención de códigos**: `CH-01`–`CH-12` = changes propios de este roadmap; `CH-13`–`CH-14` = rectificaciones del roadmap (aplicadas/documentadas); `C-01`–`C-08` = casos de prueba de la cátedra (no confundir). Los casos `D-01`–`D-07` son los de despliegue en VPS.
 
 ---
 
@@ -20,6 +20,7 @@
 ## Rectificaciones
 
 - **CH-13 `ch-13-validacion-rango-int4` (aplicado):** corrige de forma transversal el bug de validación de rango `int4` detectado tras CH-04 en los módulos implementados de **CH-05 (`libros-autorias`)** y **CH-06 (`clientes-perfil`)**: ids de ruta, `offset`/`genero_id` de listados y body ids/enteros de entrada (incluido `autores[].orden`) fuera de rango (`> 2147483647`, ej. `99999999999`) responden **422** sin ejecutar handler/consulta de negocio y sin exponer internos de la base (RN-12). `id == 0` mantiene 404 donde la inexistencia la resuelve el service (decisión CH-05). **Ventas queda excluida del alcance de CH-13** porque `app/modules/ventas/` existe solo como stubs y CH-07 (`ventas-renglones`) está pendiente: el change propio de ventas (CH-07) debe nacer con estos límites `int4` desde su origen (path `GET /ventas/{id}`, `offset`/`limit` RN-10 en `GET /ventas/`, body ids `cliente_id` y `renglones[].libro_id`, `id==0`→404, 422 sin internals y sin pre-check RT-02/DD-04). Artefactos: `openspec/changes/ch-13-validacion-rango-int4/` (alcance reducido a libros/clientes).
+- **CH-14 `ch-14-rectificacion-active-stack` (2026-11-11, documentado):** rectificación metodológica Active Stack/SDD sin tocar app ni `.http` ni archivados. Agrega `specs/casos-http-c/spec.md` para cubrir la omisión de specs en CH-09 (C-01..C-08, referencias a C-05/C-06 existentes, C-07 con conteos observados en base local vacía con seed) y documenta auditoría B.1–B.8 con evidencia de herramienta. **CH-13 está reflejado en `openspec/specs`** (`cli_missing=0` y `lib_missing=0`: los requisitos del delta están en `openspec/specs`; el hash distinto es esperable entre delta y spec consolidada). Hallazgos confirmados: CH-09 sin specs, CH-13 sin `.openspec.yaml`, CH-05 con `README.md` extra, CH-10 con tareas sin tildar, ruta no archivada citada en nota CH-13 y CH-11 manual/no archivado con brecha de proceso respecto a CH-12. CH-11 queda registrado como completado a mano (2026-11-11) sin propose/apply ni carpeta archivada. Se propone una excepción formal al checklist 4.4 de la guía para que CH-12 pueda avanzar (recomendación O3 + nota de evidencia O1); pendiente de confirmación de Facundo y Andrés, que fijará la fecha de la excepción. Evidencia: DEPLOY.md y evidencia/D-03, D-04 y D-07. No se inventa propose retroactivo.
 
 ---
 
@@ -46,6 +47,8 @@ CH-01 foundation-setup
   └── CH-03 docker-imagen (solo necesita CH-01; arranca temprano, DD-06)
         └── CH-10 despliegue-vps-inicial (CH-02 ✓ + CH-03 ✓; detección temprana red/host.docker.internal)
               └── CH-11 despliegue-vps-datos (ver arriba)
+
+CH-14 rectificacion-active-stack (rectificación documental/método, 2026-11-11): spec CH-09 + auditoría; no altera dependencias ni estados de CH-01–CH-13
 ```
 
 ### Paralelismo por fase
@@ -339,3 +342,13 @@ Paso │ Agente A (Backend Core) │ Agente B (Backend Aux)        │ Agente C 
   - `openspec/changes/ch-13-validacion-rango-int4/proposal.md`, `design.md`, `tasks.md` y deltas en `specs/`
   - `knowledge-base/05_reglas_de_negocio.md` (RN-10, RN-12, RT-01, RT-02)
   - `knowledge-base/06_funcionalidades.md` (contratos de libros/clientes) y `knowledge-base/09_decisiones_y_supuestos.md` (DD-04)
+
+### [CH-14] `ch-14-rectificacion-active-stack`
+- **Estado**: `[x]` archivado (2026-11-12)
+- **Scope**: Rectificación Active Stack/SDD sin tocar código de la app ni `.http` ni changes archivados. (A) Agrega `specs/casos-http-c/spec.md` (Purpose, ADDED Requirements, un requirement por C-01 a C-08, escenarios verificables y referenciados a evidencia existente; C-05/C-06 referenciados en artefactos CH-07/CH-08 sin duplicar). (B) Auditoría B.1–B.8 en `design.md` con comandos/salidas y `[VERIFICAR]` donde no hay evidencia (incluye hallazgos CH-09 sin specs, CH-13 sin `.openspec.yaml` y CH-13 reflejado en `openspec/specs` por encabezados/contenido con hash distinto esperable, CH-05 con `README.md`, CH-10 con tareas sin tildar, nota CH-13 con ruta no archivada, y CH-11 manual/no archivado con brecha de proceso respecto a CH-12 con recomendación O3 + nota de evidencia O1 pendiente de confirmación de Facundo y Andrés, sin propose retroactivo).
+  - Artefactos: `openspec/changes/ch-14-rectificacion-active-stack/` (proposal, design, specs, tasks), actualización acotada de `CHANGES.md`, pregunta abierta en `knowledge-base/10_preguntas_abiertas.md` y actualización de `.active-orchestrator-state.json`.
+- **Dependencias**: CH-09 (contexto de spec faltante), CH-13/roadmap archivado (auditoría)
+- **Governance**: BAJO
+- **Leer antes**:
+  - `openspec/changes/ch-14-rectificacion-active-stack/proposal.md`, `design.md`, `tasks.md`, `specs/casos-http-c/spec.md`
+  - `CHANGES.md`, `AGENTS.md`, `CLAUDE.md`, `knowledge-base/10_preguntas_abiertas.md`
