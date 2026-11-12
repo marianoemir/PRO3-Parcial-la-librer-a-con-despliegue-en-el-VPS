@@ -258,7 +258,7 @@ Paso │ Agente A (Backend Core) │ Agente B (Backend Aux)        │ Agente C 
   - `knowledge-base/10_preguntas_abiertas.md` §(6) y §(1) — PENDIENTES
 
 ### [CH-09] `casos-http-C`
-- **Estado**: `[ ]` pendiente
+- **Estado**: `[x]` completado
 - **Scope**: Batería `test/*.http` con los casos C-01 a C-08 ejecutables en orden
   - Dueño potencial: Agente B (Backend Aux) — una sesión (~4-6 h)
   - Casos cubiertos: C-01, C-02, C-03, C-04, C-05, C-06, C-07 (request) y C-08

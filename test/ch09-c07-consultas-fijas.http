@@ -1,0 +1,48 @@
+@base = http://127.0.0.1:8000
+
+# CH-09 — C-07 portable: detalles con uno frente a varios autores/renglones.
+#
+# Ejecutar solo después del ciclo limpio documentado en
+# `ch09-casos-http-c.http` y después de reutilizar C-06 desde
+# `test/ch08-seed-datos-iniciales.http`. Los ids 1, 2, 3 y 6 de abajo son
+# fixtures de ese ciclo, no contratos públicos de la API ni ids reutilizables
+# en una base ya usada.
+#
+# Para observar C-07, reiniciar localmente la API con el diagnóstico SQL
+# habilitado y comparar en consola las consultas de cada par: libro 1 vs 6 y
+# venta 2 vs 3. No guardar la salida SQL aquí ni en `evidencia/`: CH-12 es el
+# dueño de la evidencia final. La comparación requerida es igualdad/fijeza de
+# cada par, no un número nuevo de SELECTs.
+
+### C-07a — fixture seed: libro 1 tiene una autoría
+# Esperado: 200; editorial y género serializados; `autores` contiene solo
+# autor_id 1, rol "autor", orden 1. Comparar su cantidad de consultas con libro 6.
+GET {{base}}/libros/1
+
+### C-07b — fixture seed: libro 6 tiene dos autorías
+# Esperado: 200; `autores` contiene autor_id 3 (coautor, orden 1) y autor_id 4
+# (coautor, orden 2). La cantidad de consultas debe ser fija e igual a C-07a.
+GET {{base}}/libros/6
+
+### C-07c — fixture del ciclo: venta 2 creada por C-06, con dos renglones
+# Esperado: 200; cliente id 2; renglones libro 1 x2 y libro 4 x1; total
+# "77000.00". Comparar su cantidad de consultas con venta 3.
+GET {{base}}/ventas/2
+
+### C-07d — fixture auxiliar válida: venta de un renglón, solo en base limpia
+# Esperado: 201; en este orden genera venta id 3. No enviar precio, total ni fecha.
+POST {{base}}/ventas/
+Content-Type: application/json
+
+{
+  "cliente_id": 2,
+  "renglones": [
+    {"libro_id": 2, "cantidad": 1}
+  ]
+}
+
+### C-07e — detalle de la fixture auxiliar de un renglón
+# Esperado: 200; cliente id 2; un renglón con libro_id 2, cantidad 1 y precio
+# unitario "18000.00"; total "18000.00". La cantidad de consultas debe ser fija
+# e igual a C-07c, aunque esta venta tenga menos renglones.
+GET {{base}}/ventas/3
