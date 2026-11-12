@@ -340,7 +340,7 @@ Paso │ Agente A (Backend Core) │ Agente B (Backend Aux)        │ Agente C 
   - `docs/Parcial_Cap1a4_Consigna.pdf` y `knowledge-base/`
 
 ### [CH-16] `mapa-casos-y-evidencia-c07`
-- **Estado**: `[ ]` en progreso
+- **Estado**: `[x]` archivado (2026-11-12)
 - **Scope**: Ajustes de trazabilidad y evidencia docente previa al cierre:
   - Encabezado histórico de advertencia en `test/ch07-ventas-exito.http` (no altera peticiones).
   - Aviso de acceso HTTP plano en `README.md` y mapa exhaustivo de casos de prueba C-01 a C-08 con rótulos exactos y precondiciones de seed.
