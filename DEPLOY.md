@@ -12,7 +12,7 @@
 
 ## Entorno
 - Servidor: VPS con Ubuntu y Docker 29.8.0. **[A COMPLETAR: VPS asignado por la cátedra / propio del grupo]**
-- Base de datos: PostgreSQL 18 que ya corre en el servidor como contenedor (servicio `grupo10_db`), base `libreria` con usuario propio (`libreria_app`). La consigna indica PostgreSQL 16: con la 18 el arranque completo funciona, `create_all` crea las 9 tablas y asyncpg conecta sin problemas (ver `evidencia/ch-10-vps/D-02-despliegue-limpio.txt`).
+- Base de datos: PostgreSQL 18 que ya corre en el servidor como contenedor (servicio `grupo10_db`), base propia `libreria` con usuario propio (`libreria_app`). Según lo indicado por el profesor, la aplicación usa el PostgreSQL de la calculadora del grupo (`grupo10_db`); no se pidieron datos de acceso adicionales. La consigna indica PostgreSQL 16: con la 18 el arranque completo funciona, `create_all` crea las 9 tablas y asyncpg conecta sin problemas (ver `evidencia/ch-10-vps/D-02-despliegue-limpio.txt`).
 - La base no forma parte de la imagen y no se usa Docker Compose.
 - Imagen base `python:3.12-alpine` (74,8 MB en disco, medido en el VPS; ver `evidencia/ch-10-vps/D-01-imagenes.txt`). La imagen `libreria` ocupa 264 MB en disco.
 
@@ -66,7 +66,10 @@ docker run -d --name libreria --network easypanel-grupo10 -p 8000:8000 \
 Los datos no se pierden: viven en la base del servidor y no en el contenedor. Eliminar y volver a correr el contenedor lo deja otra vez `healthy` (ver `evidencia/ch-10-vps/recuperacion-healthy.txt`).
 
 ## Evidencia
-Salidas de los casos D en `evidencia/`. Las de CH-11 están directamente en `evidencia/`:
+Salidas de los casos D y consultas C-07 documentadas en el índice canónico `evidencia/LEEME.md`.
+Hay dos ubicaciones. Las vigentes (consultas C-07 y casos D-03, D-04 y D-07) están directamente en `evidencia/`:
+- `C-07-consola-sql.log`: log con `SQL_ECHO=true` demostrando consultas sin N+1 con el seed actual.
+- `C-07-conteo.txt`: resumen de consultas por endpoint (3 SELECT en el detalle de libro y en el alta de venta; 2 en el detalle de venta).
 - `D-03-url-publica.txt`: seed, `GET /health/ready`, `GET /libros/` y `POST /ventas/` desde afuera, en la URL pública.
 - `D-04-persistencia.txt`: `docker rm -f` y el mismo `docker run`; vuelve a `healthy` y los datos siguen.
 - `D-07-aviso-comprobante.txt`: el aviso del comprobante en `docker logs`, después de la línea de la respuesta.
