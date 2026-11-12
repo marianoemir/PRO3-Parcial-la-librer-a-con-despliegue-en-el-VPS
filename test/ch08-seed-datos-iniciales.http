@@ -1,59 +1,44 @@
-@base = http://127.0.0.1:8010
+@base = http://127.0.0.1:8000
 
-# CH-08 — Datos iniciales (seed): casos verificables después de `python -m app.seed`
+# CH-15 / seed vigente — Datos iniciales (seed) y verificación del estado sembrado
 #
-# Requisitos para ejecutar este archivo:
-#   1) El esquema existe: se arrancó `uvicorn app.main:app` al menos una vez.
-#   2) Se ejecutó `python -m app.seed` y terminó con exit 0 (30 filas insertadas).
-#   3) uvicorn escucha en @base (cualquier puerto libre sirve; ver nota de evidencia).
+# Prerrequisitos:
+#   1) Usar una base local dedicada y vacía (libreria_c15). El esquema debe existir
+#      (arrancar `uvicorn app.main:app` al menos una vez para que el lifespan cree las tablas).
+#   2) Ejecutar `python -m app.seed` y confirmar exit 0. Cada ejecución reinicia los
+#      datos de las 9 tablas del proyecto al dataset documentado (27 filas).
+#   3) uvicorn en escucha en @base.
 #
-# Nota de evidencia: las respuestas "Obtenido" fueron capturadas con `curl.exe`
-# el 2026-11-11 contra uvicorn en 127.0.0.1:8011, sobre la base temporal
-# `libreria_seed_ch08` recreada desde cero (esquema por el lifespan + seed).
-# El contrato HTTP es el mismo en cualquier puerto/base sembrada.
+# Dataset esperado tras el seed (27 filas):
+# - 2 editoriales, 2 géneros, 5 autores, 5 libros (ids 1..5), 5 autorías,
+#   3 clientes, 2 perfiles, 1 venta y 2 renglones.
+# - Cliente 2: "Tomás Ríos" (tomas@example.com). Venta 1: cliente 2, libro 1 ×2
+#   (25000.00) y libro 4 ×1 (27000.00), total 77000.00, fecha fija.
+# - El ISBN 978-950-00-0006-6 NO está precargado en el seed (se crea una sola vez
+#   en test/ch09-c07-consultas-fijas.http para evitar error 409 por duplicación).
 
-### D-03 (task 3.3): GET /health/ready — base disponible
+### Estado inicial — GET /health/ready
 # Esperado: 200 {"estado":"listo"}
 GET {{base}}/health/ready
-# Obtenido: 200
-# {"estado":"listo"}
 
-### D-03 (task 3.3): GET /libros/ — 200 con los 6 libros del dataset
-# Esperado: 200, lista de 6 libros (ids 1..6) con los ISBN y precios del README
+### Estado inicial — GET /libros/ devuelve 5 libros
+# Esperado: 200, lista de 5 libros (ids 1..5). No debe aparecer el ISBN 978-950-00-0006-6.
 GET {{base}}/libros/
-# Obtenido: 200
-# [{"id":1,"isbn":"978-950-00-0001-1","titulo":"Rayuela","precio":"25000.00","stock":10,"editorial_id":1,"genero_id":1,"editorial":{"id":1,"nombre":"Sudamericana","pais":"Argentina"},"genero":{"id":1,"nombre":"Novela"}},{"id":2,"isbn":"978-950-00-0002-8","titulo":"Bestiario","precio":"18000.00","stock":6,"editorial_id":1,"genero_id":2,"editorial":{"id":1,"nombre":"Sudamericana","pais":"Argentina"},"genero":{"id":2,"nombre":"Cuento"}},{"id":3,"isbn":"978-950-00-0003-5","titulo":"La invención de Morel","precio":"20000.00","stock":5,"editorial_id":1,"genero_id":1,"editorial":{"id":1,"nombre":"Sudamericana","pais":"Argentina"},"genero":{"id":1,"nombre":"Novela"}},{"id":4,"isbn":"978-950-00-0004-2","titulo":"Respiración artificial","precio":"27000.00","stock":7,"editorial_id":2,"genero_id":1,"editorial":{"id":2,"nombre":"Anagrama","pais":"España"},"genero":{"id":1,"nombre":"Novela"}},{"id":5,"isbn":"978-950-00-0005-9","titulo":"El túnel","precio":"19500.00","stock":3,"editorial_id":1,"genero_id":1,"editorial":{"id":1,"nombre":"Sudamericana","pais":"Argentina"},"genero":{"id":1,"nombre":"Novela"}},{"id":6,"isbn":"978-950-00-0006-6","titulo":"Los que aman, odian","precio":"21000.00","stock":4,"editorial_id":1,"genero_id":1,"editorial":{"id":1,"nombre":"Sudamericana","pais":"Argentina"},"genero":{"id":1,"nombre":"Novela"}}]
 
-### (task 3.3) GET /libros/6 — el libro del enunciado con autores 3 y 4
-# Esperado: 200, id 6, ISBN 978-950-00-0006-6, precio 21000.00, stock 4,
-# editorial 1, género 1 y autorías: autor 3 (coautor, orden 1) y autor 4
-# (coautor, orden 2)
-GET {{base}}/libros/6
-# Obtenido: 200
-# {"id":6,"isbn":"978-950-00-0006-6","titulo":"Los que aman, odian","precio":"21000.00","stock":4,"editorial_id":1,"genero_id":1,"editorial":{"id":1,"nombre":"Sudamericana","pais":"Argentina"},"genero":{"id":1,"nombre":"Novela"},"autores":[{"autor_id":3,"rol":"coautor","orden":1,"autor":{"id":3,"nombre":"Adolfo Bioy Casares"}},{"autor_id":4,"rol":"coautor","orden":2,"autor":{"id":4,"nombre":"Silvina Ocampo"}}]}
-
-### (task 3.3) GET /clientes/2 — el cliente de la venta 1
-# Esperado: 200, id 2 "Bruno Díaz" con su email; perfil null porque el dataset
-# deja perfil solo para los clientes 1 y 3
+### Estado inicial — GET /clientes/2 es Tomás Ríos
+# Esperado: 200, id 2, nombre "Tomás Ríos", email "tomas@example.com", perfil null.
 GET {{base}}/clientes/2
-# Obtenido: 200
-# {"id":2,"nombre":"Bruno Díaz","email":"bruno.diaz@example.com","perfil":null}
 
-### (task 3.3) GET /ventas/1 — la venta del dataset
-# Esperado: 200, total "77000.00", cliente 2 y dos renglones:
-# libro 1 ×2 con precio_unitario "25000.00" (subtotal "50000.00") y
-# libro 4 ×1 con precio_unitario "27000.00" (subtotal "27000.00")
+### Estado inicial — GET /ventas/1 del dataset
+# Esperado: 200, total "77000.00", cliente Tomás Ríos (tomas@example.com) y dos renglones:
+# libro 1 ×2 precio_unitario "25000.00" subtotal "50000.00",
+# libro 4 ×1 precio_unitario "27000.00" subtotal "27000.00".
 GET {{base}}/ventas/1
-# Obtenido: 200
-# {"id":1,"fecha":"2026-01-15T12:00:00Z","total":"77000.00","cliente":{"id":2,"nombre":"Bruno Díaz","email":"bruno.diaz@example.com"},"renglones":[{"libro_id":1,"titulo":"Rayuela","cantidad":2,"precio_unitario":"25000.00","subtotal":"50000.00"},{"libro_id":4,"titulo":"Respiración artificial","cantidad":1,"precio_unitario":"27000.00","subtotal":"27000.00"}]}
 
-### C-06 (task 3.3): POST /ventas/ — 201 con precios copiados del catálogo
-# Esperado: 201, id 2 (siguiente a la venta 1 del seed: confirma la secuencia
-# alineada), cliente 2, renglón libro 1 cantidad 2 precio_unitario "25000.00"
-# subtotal "50000.00", renglón libro 4 cantidad 1 precio_unitario "27000.00"
-# subtotal "27000.00", total "77000.00" y fecha asignada por el servidor.
-# Solo se envían cliente_id y renglones: precio_unitario y total los calcula
-# el servidor (RN-06/RN-07).
+### Ejemplo enunciado / C-06 — POST /ventas/ produce id 2 y total 77000.00
+# Precondición: ejecutar sobre el estado recién sembrado (venta 1 ya existe con id 1).
+# Esperado: 201, id 2, cliente Tomás Ríos (tomas@example.com), renglones con titulo, precio_unitario
+# y subtotal calculados por el servidor, total "77000.00".
 POST {{base}}/ventas/
 Content-Type: application/json
 
@@ -64,96 +49,17 @@ Content-Type: application/json
     {"libro_id": 4, "cantidad": 1}
   ]
 }
-# Obtenido: 201
-# {"id":2,"fecha":"2026-11-11T20:38:26.124113Z","total":"77000.00","cliente":{"id":2,"nombre":"Bruno Díaz","email":"bruno.diaz@example.com"},"renglones":[{"libro_id":1,"titulo":"Rayuela","cantidad":2,"precio_unitario":"25000.00","subtotal":"50000.00"},{"libro_id":4,"titulo":"Respiración artificial","cantidad":1,"precio_unitario":"27000.00","subtotal":"27000.00"}]}
-# Al reejecutar este archivo sobre la misma base, el id esperado es el siguiente
-# al máximo de `venta` (3 en la segunda pasada), no 2.
 
-### (task 3.4) Stock sin descuento — libro 1 (KB §1 pendiente)
-# Esperado: 200, stock 10 tanto después del seed como después del POST del C-06
-# (el seed y el alta de ventas no descuentan stock: §(1) sigue pendiente)
+### Stock sin descuento — libro 1 (KB §1 pendiente)
+# Esperado: 200, stock 10 (el seed y el alta no descuentan stock).
 GET {{base}}/libros/1
-# Obtenido: 200, stock 10 (antes y después del POST /ventas/ del C-06)
-# {"id":1,"isbn":"978-950-00-0001-1","titulo":"Rayuela","precio":"25000.00","stock":10,"editorial_id":1,"genero_id":1,"editorial":{"id":1,"nombre":"Sudamericana","pais":"Argentina"},"genero":{"id":1,"nombre":"Novela"},"autores":[{"autor_id":1,"rol":"autor","orden":1,"autor":{"id":1,"nombre":"Julio Cortázar"}}]}
 
-### (task 3.4) Stock sin descuento — libro 4 (KB §1 pendiente)
-# Esperado: 200, stock 7 tanto después del seed como después del POST del C-06
+### Stock sin descuento — libro 4 (KB §1 pendiente)
+# Esperado: 200, stock 7.
 GET {{base}}/libros/4
-# Obtenido: 200, stock 7 (antes y después del POST /ventas/ del C-06)
-# {"id":4,"isbn":"978-950-00-0004-2","titulo":"Respiración artificial","precio":"27000.00","stock":7,"editorial_id":2,"genero_id":1,"editorial":{"id":2,"nombre":"Anagrama","pais":"España"},"genero":{"id":1,"nombre":"Novela"},"autores":[{"autor_id":2,"rol":"autor","orden":1,"autor":{"id":2,"nombre":"Ricardo Piglia"}}]}
 
-# ===========================================================================
-# Task 3.4 — Verificación integral tipo D-03 en local (secuencia real ejecutada)
-# ===========================================================================
-#
-# Base temporal de verificación (no se usó `libreria_dev`):
-#   - Se creó `libreria_seed_ch08` en el mismo servidor de `DATABASE_URL`.
-#   - `DATABASE_URL` se sobrescribió solo para el proceso (variable de entorno).
-#
-# 1) Recrear la base y confirmar que NO tiene esquema:
-#    $ drop/create temp  -> base libreria_seed_ch08: eliminada / creada
-#    SELECT count(*) FROM information_schema.tables WHERE table_schema='public'
-#    -> {'tablas': 0}
-#
-# 2) Arrancar la API: el lifespan crea el esquema (el seed no lo crea):
-#    $ uvicorn app.main:app --host 127.0.0.1 --port 8011
-#    INFO:   Arranque completado; tablas creadas: ['autor', 'cliente',
-#    'editorial', 'genero', 'libro', 'libro_autor', 'perfil_cliente',
-#    'renglon_venta', 'venta']
-#    INFO:   Application startup complete.
-#
-# 3) Ejecutar el seed (python -m app.seed), salida real:
-#    Datos iniciales (seed) — librería
-#
-#    Tabla             Insertadas   Ya existían
-#    ------------------------------------------
-#    editorial                  2             0
-#    genero                     2             0
-#    autor                      5             0
-#    libro                      6             0
-#    libro_autor                7             0
-#    cliente                    3             0
-#    perfil_cliente             2             0
-#    venta                      1             0
-#    renglon_venta              2             0
-#    ------------------------------------------
-#    Total                     30             0
-#
-#    Ids del dataset:
-#      editorial: 1, 2
-#      genero: 1, 2
-#      autor: 1, 2, 3, 4, 5
-#      libro: 1, 2, 3, 4, 5, 6
-#      libro_autor: (libro 1, autor 1), (libro 2, autor 1), (libro 3, autor 3),
-#                   (libro 4, autor 2), (libro 5, autor 5), (libro 6, autor 3),
-#                   (libro 6, autor 4)
-#      cliente: 1, 2, 3
-#      perfil_cliente: 1, 2
-#      venta: 1
-#      renglon_venta: 1, 2
-#
-#    Secuencias alineadas con el máximo id cargado de cada tabla.
-#    exit=0
-#
-# 4) Encadenado HTTP (respuestas completas arriba): /health/ready 200,
-#    /libros/ 200 con 6 libros, /ventas/1 200 con total "77000.00" y sus dos
-#    renglones, POST /ventas/ del C-06 201 con id 2 y total "77000.00".
-#
-# 5) Stock tras el POST del C-06 (sin descuento, KB §1 pendiente):
-#    SELECT id, isbn, titulo, precio, stock FROM libro WHERE id IN (1,4)
-#    -> {'id': 1, 'precio': Decimal('25000.00'), 'stock': 10}
-#    -> {'id': 4, 'precio': Decimal('27000.00'), 'stock': 7}
-#    SELECT count(*) FROM venta / renglon_venta / libro / editorial
-#    -> ventas 2, renglones 4, libros 6, editoriales 2
-#
-# 6) Sin cambios de esquema ni de módulos. `git status --short` (real):
-#     M README.md
-#    ?? app/seed.py
-#    ?? openspec/changes/ch-08-seed-datos-iniciales/
-#    ?? test/ch08-seed-datos-iniciales.http
-#    Es decir: solo el módulo nuevo, la documentación y las pruebas; ni
-#    `app/modules/*`, ni `app/main.py`, ni `app/core/*`, ni el `Dockerfile`.
-#    El seed no ejecuta create_all: `app/seed.py` no importa SQLModel ni llama
-#    a metadata.create_all (solo importa los modelos para resolver las FK).
-#
-# 7) La base temporal `libreria_seed_ch08` se eliminó al terminar.
+### Repetibilidad — procedimiento
+# 1) Tras el seed y la creación de la venta 2, crear filas adicionales por la API.
+# 2) Reejecutar `python -m app.seed`.
+# 3) Verificar: conteos vuelven exactamente a 27 filas, GET /ventas/2 -> 404, y el siguiente
+#    POST /ventas/ del ejemplo vuelve a devolver 201 con id 2.

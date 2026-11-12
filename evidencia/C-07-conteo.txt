@@ -1,0 +1,6 @@
+﻿POST   /libros/       SELECT=3
+GET    /libros/1      SELECT=3
+GET    /libros/6      SELECT=3
+GET    /ventas/1      SELECT=2
+POST   /ventas/       SELECT=3
+GET    /ventas/2      SELECT=2
