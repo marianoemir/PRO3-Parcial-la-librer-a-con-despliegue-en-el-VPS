@@ -317,7 +317,7 @@ Paso │ Agente A (Backend Core) │ Agente B (Backend Aux)        │ Agente C 
   - `knowledge-base/10_preguntas_abiertas.md` §(2) — PENDIENTE
 
 ### [CH-12] `evidencia-entrega`
-- **Estado**: `[ ]` pendiente
+- **Estado**: `[x]` archivado (2026-11-12)
   - **Nota de alcance (12/11/2026)**: Tanda a = README final, DEPLOY.md, organización de evidencia/ (vigente vs histórica ch-07-local/) y auditoría de ausencia de secretos en el historial Git; la verificación del .zip queda para la tanda b, después de la revisión exhaustiva.
 - **Scope**: Carpeta `evidencia/` completa + README final + verificación del `.zip` de entrega
   - Dueño potencial: Agente C (Infra/DevOps) — una sesión (~4-6 h)
