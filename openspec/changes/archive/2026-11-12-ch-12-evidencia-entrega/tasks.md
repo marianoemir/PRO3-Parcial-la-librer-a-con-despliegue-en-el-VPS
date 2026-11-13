@@ -1,6 +1,6 @@
 # Tasks: ch-12-evidencia-entrega
 
-> **Nota de ejecución**: Este apply ejecuta solo los grupos 1 a 5. El grupo 6 (tanda b) NO se ejecuta ni se tilda; CH-12 no se archiva en este apply.
+> **Nota de ejecución**: El grupo 6 se ejecutó el 12/11/2026 sobre main con CH-17 mergeado, sin tocar las tareas 1 a 5 (la 2.1 conserva la verificación histórica de la marca [A COMPLETAR], que CH-17 reemplazó después).
 
 ## 1. Actualización de README.md (Tanda a)
 
@@ -163,17 +163,17 @@
 
 ## 6. Verificación de Entrega en Archivo .zip (Tanda b — Diferida para cierre de CH-12)
 
-- [ ] 6.1 Generar archivo de empaquetado de prueba fuera del repositorio usando `git archive`:
+- [x] 6.1 Generar archivo de empaquetado de prueba fuera del repositorio usando `git archive`:
   ```powershell
   git archive --format=zip --prefix=libreria/ -o "$env:TEMP\test-entrega.zip" HEAD
   ```
   Esperado: archivo `$env:TEMP\test-entrega.zip` generado fuera del workspace.
-- [ ] 6.2 Certificar que el archivo empaquetado no incluya `.env`, `.venv` ni `__pycache__`:
+- [x] 6.2 Certificar que el archivo empaquetado no incluya `.env`, `.venv` ni `__pycache__`:
   ```powershell
   tar -tf "$env:TEMP\test-entrega.zip" | Select-String '(^|/)\.env$', '\.venv', '__pycache__'
   ```
   Esperado: ninguna coincidencia (salida vacía).
-- [ ] 6.3 Eliminar el archivo temporal `$env:TEMP\test-entrega.zip` tras la verificación sin dejar residuos en el repositorio:
+- [x] 6.3 Eliminar el archivo temporal `$env:TEMP\test-entrega.zip` tras la verificación sin dejar residuos en el repositorio:
   ```powershell
   Remove-Item "$env:TEMP\test-entrega.zip" -Force
   Test-Path "$env:TEMP\test-entrega.zip"
